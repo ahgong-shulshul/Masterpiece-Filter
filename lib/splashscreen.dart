@@ -3,6 +3,7 @@ import 'package:lottie/lottie.dart';
 import 'package:animated_splash_screen/animated_splash_screen.dart';
 import 'package:page_transition/page_transition.dart';
 import './Home.dart';
+import './camera.dart';
 
 class SplashScreen extends StatelessWidget{
   const SplashScreen({Key? key}):super(key: key);
