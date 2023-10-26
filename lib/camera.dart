@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import './filter.dart';
 
 class CameraExe extends StatefulWidget {
   const CameraExe({Key? key}) : super(key: key);
@@ -28,9 +29,11 @@ class _CameraExeState extends State<CameraExe> {
   // 이미지를 보여주는 위젯
   Widget showImage() {
     return Container(
+        alignment: Alignment.topCenter,
         color: const Color.fromARGB(255, 247, 249, 251),
+        //color: Colors.amber,
         width: MediaQuery.of(context).size.width,
-        height: MediaQuery.of(context).size.width * 1.3,
+        height: MediaQuery.of(context).size.height * 0.7,
         child: Center(
             child: _image == null
                 ? Text('Take Image')
@@ -39,7 +42,6 @@ class _CameraExeState extends State<CameraExe> {
 
   @override
   Widget build(BuildContext context) {
-
     // 화면 세로 고정
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
@@ -51,30 +53,29 @@ class _CameraExeState extends State<CameraExe> {
         body: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            SizedBox(height: 10.0),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: <Widget>[
                 // 뒤로가기 버튼 -> 카메라 다시 촬영
-                FloatingActionButton(
-                  child: Icon(Icons.chevron_left),
-                  tooltip: 'pick Iamge',
+                IconButton(
+                  icon: Icon(Icons.arrow_back_ios_new),
                   onPressed: () {
                     getImage(ImageSource.camera);
                   },
                 ),
-
-                // 갤러리에서 이미지를 가져오는 버튼
-                FloatingActionButton(
-                  child: Icon(Icons.image),
-                  tooltip: 'pick Iamge',
-                  onPressed: () {
-                    getImage(ImageSource.gallery);
-                  },
-                ),
+                Spacer(),
+                // // 갤러리에서 이미지를 가져오는 버튼
+                // FloatingActionButton(
+                //   child: Icon(Icons.image),
+                //   onPressed: () {
+                //     getImage(ImageSource.gallery);
+                //   },
+                // ),
+                // Spacer(),
                 // 필터 적용 버튼
-                FloatingActionButton(
-                  child: Icon(Icons.done),
-                  tooltip: 'pick Iamge',
+                IconButton(
+                  icon: Icon(Icons.check),
                   onPressed: () {
                     // 필터 적용 된 사진 띄우기
                   },
@@ -82,7 +83,15 @@ class _CameraExeState extends State<CameraExe> {
               ],
             ),
             showImage(),
-            SizedBox(height: 50.0),   // 나중에 필터 선택 창이 될 곳
+            Container(
+              color: Color.fromARGB(255, 247, 249, 251),
+              height: MediaQuery.of(context).size.height * 0.2,
+              width: MediaQuery.of(context).size.width,
+              padding: EdgeInsets.all(2),
+              margin: EdgeInsets.all(2),
+              child: listview_builder(),
+
+            ),   // 나중에 필터 선택 창이 될 곳
           ],
         )
     );

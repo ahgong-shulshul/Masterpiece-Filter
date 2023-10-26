@@ -19,6 +19,7 @@ class _HomePageState extends State<HomePage> {
             children:[
             // 사진 촬영으로 이동하는 버튼
             FloatingActionButton.extended(
+              heroTag: 'camera',
               icon: Icon(
                       Icons.photo_camera,
                       color: Colors.black,
@@ -40,6 +41,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 40),
             // 갤러리에서 이미지를 가져오는 버튼
             FloatingActionButton.extended(
+              heroTag: 'gallery',
               icon: Icon(
                   Icons.image,
                   color: Colors.black,
@@ -61,6 +63,7 @@ class _HomePageState extends State<HomePage> {
             SizedBox(height: 40),
             // 로그인으로 이동하는 버튼
             FloatingActionButton.extended(
+              heroTag: 'login',
               icon: Icon(
                 Icons.login,
                 color: Colors.black,
