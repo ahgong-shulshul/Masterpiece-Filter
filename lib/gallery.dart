@@ -4,15 +4,15 @@ import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import './filter.dart';
 
-class CameraExe extends StatefulWidget {
-  const CameraExe({Key? key}) : super(key: key);
+class GalleryExe extends StatefulWidget {
+  const GalleryExe({Key? key}) : super(key: key);
 
   @override
-  _CameraExeState createState() => _CameraExeState();
+  _GalleryExeState createState() => _GalleryExeState();
 
 }
 
-class _CameraExeState extends State<CameraExe> {
+class _GalleryExeState extends State<GalleryExe> {
   File? _image;
   final picker = ImagePicker();
 
@@ -24,13 +24,6 @@ class _CameraExeState extends State<CameraExe> {
       _image = File(image!.path); // 가져온 이미지를 _image에 저장
     });
 
-  }
-
-  void changeImage(File img) async{
-    final image = img;
-    setState(() {
-      _image = File(image!.path);
-    });
   }
 
   // 이미지를 보여주는 위젯
@@ -53,7 +46,7 @@ class _CameraExeState extends State<CameraExe> {
     SystemChrome.setPreferredOrientations(
         [DeviceOrientation.portraitUp, DeviceOrientation.portraitDown]);
 
-    if(_image == null) getImage(ImageSource.camera);
+    if(_image == null) getImage(ImageSource.gallery);
 
     return Scaffold(
         backgroundColor: const Color.fromARGB(255, 247, 249, 251),
@@ -66,21 +59,13 @@ class _CameraExeState extends State<CameraExe> {
               children: <Widget>[
                 // 뒤로가기 버튼 -> 카메라 다시 촬영
                 IconButton(
-                  icon: Icon(Icons.arrow_back_ios_new),
+                  icon: Icon(Icons.image),
                   onPressed: () {
-                    getImage(ImageSource.camera);
+                    getImage(ImageSource.gallery);
                   },
                 ),
                 Spacer(),
-                // // 갤러리에서 이미지를 가져오는 버튼
-                // FloatingActionButton(
-                //   child: Icon(Icons.image),
-                //   onPressed: () {
-                //     getImage(ImageSource.gallery);
-                //   },
-                // ),
-                // Spacer(),
-                // 필터 적용 버튼
+
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {

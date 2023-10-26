@@ -1,7 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import './camera.dart';
 
-final List<Image> filters = <Image>[Image.asset("assets/tmp4.png", fit: BoxFit.fill,),
+final List<Image> filters = <Image>[Image.asset("assets/tmp5.png", fit: BoxFit.fill,),
   Image.asset("assets/splash.png", fit: BoxFit.fill,),
   Image.asset("assets/tmp2.png", fit: BoxFit.fill,),
   Image.asset("assets/tmp4.png", fit: BoxFit.fill,),
