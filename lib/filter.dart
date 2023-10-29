@@ -27,7 +27,7 @@ Widget listview_builder(){
                 ),
             ),
             onTap: () => ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Hello world'),),
+              SnackBar(content: Text(index.toString() + " is selected"),),
             )
         );
       },

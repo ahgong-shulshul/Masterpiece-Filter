@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/showResult.dart';
 import './filter.dart';
 
 class CameraExe extends StatefulWidget {
@@ -39,7 +40,7 @@ class _CameraExeState extends State<CameraExe> {
         alignment: Alignment.topCenter,
         color: const Color.fromARGB(255, 247, 249, 251),
         //color: Colors.amber,
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width * 0.96,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Center(
             child: _image == null
@@ -73,18 +74,36 @@ class _CameraExeState extends State<CameraExe> {
                 ),
                 Spacer(),
                 // // 갤러리에서 이미지를 가져오는 버튼
-                // FloatingActionButton(
-                //   child: Icon(Icons.image),
-                //   onPressed: () {
-                //     getImage(ImageSource.gallery);
-                //   },
-                // ),
-                // Spacer(),
+                IconButton(
+                  icon: Icon(Icons.image),
+                  onPressed: () {
+                    getImage(ImageSource.gallery);
+                  },
+                ),
+                Spacer(),
+
+                // 사용자 계정으로 이동하는 버튼
+                IconButton(
+                  icon: Icon(Icons.person),
+                  onPressed: () {
+                    // 사용자 계정으로 이동(로그인 유무 생각)
+                    // Navigator.push(
+                    //   context, MaterialPageRoute(builder: (context) => const NextScreen()),
+                    // );
+                  },
+                ),
+                Spacer(),
                 // 필터 적용 버튼
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    // 필터 적용 된 사진 띄우기
+                    // 결과창으로 이동
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ShowResultPage(_image)
+                        )
+                    );
                   },
                 ),
               ],

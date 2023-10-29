@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/showResult.dart';
 import './filter.dart';
 
 class GalleryExe extends StatefulWidget {
@@ -32,7 +33,7 @@ class _GalleryExeState extends State<GalleryExe> {
         alignment: Alignment.topCenter,
         color: const Color.fromARGB(255, 247, 249, 251),
         //color: Colors.amber,
-        width: MediaQuery.of(context).size.width,
+        width: MediaQuery.of(context).size.width * 0.96,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Center(
             child: _image == null
@@ -69,7 +70,12 @@ class _GalleryExeState extends State<GalleryExe> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    // 필터 적용 된 사진 띄우기
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ShowResultPage(_image)
+                        )
+                    );
                   },
                 ),
               ],
