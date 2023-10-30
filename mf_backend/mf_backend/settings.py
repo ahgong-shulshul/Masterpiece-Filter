@@ -21,6 +21,8 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
+    'social_login.apps.SocialLoginConfig',
+    
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.sites',
@@ -33,6 +35,9 @@ INSTALLED_APPS = [
     'allauth',
     'allauth.account',
     'allauth.socialaccount',
+
+    # provider
+    'allauth.socialaccount.providers.google',
 ]
 
 MIDDLEWARE = [
