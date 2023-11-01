@@ -1,10 +1,11 @@
 from django.contrib import admin
 from django.urls import path, include
 
-# import social_login
+# import accountapp
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    # path('/', )
 
-    path('social_login/', include('social_login.urls')),
+    path('accountapp/', include('accountapp.urls')),
 ]

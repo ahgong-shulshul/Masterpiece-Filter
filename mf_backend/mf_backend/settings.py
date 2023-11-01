@@ -21,7 +21,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'social_login.apps.SocialLoginConfig',
+    'accountapp',
     
     'django.contrib.admin',
     'django.contrib.auth',
@@ -106,6 +106,18 @@ AUTHENTICATION_BACKENDS = (
     'allauth.account.auth_backends.AuthenticationBackend',
 )
 
+SOCIALACCOUNT_PROVIDERS = {
+    'google': {
+        'SCOPE': [
+            'profile',
+            'email',
+        ],
+        'AUTH_PARAMS': {
+            'access_type': 'online',
+        }
+    }
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -131,3 +143,4 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # 로그인 시 페이지 이동(default: accounts/profile)
 LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/accountapp/'
