@@ -15,14 +15,16 @@ SECRET_KEY = 'django-insecure-g!(6!q=k755r1$#_ke9)+8d3r3+kkh@htuh54gg7wd3-qe00=u
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'feed',
     'django.contrib.admin',
     'django.contrib.auth',
+    "django.contrib.sites",
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
