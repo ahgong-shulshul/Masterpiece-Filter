@@ -10,3 +10,14 @@ class Feed(models.Model):
     post_image = models.URLField()
     post_date = models.DateTimeField()
     # user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+
+
+"""
+{
+    "post_id": 3,
+    "post_title": "testing",
+    "post_des": "using postman to test API",
+    "post_image": "testing.png",
+    "post_date": "2023-11-01"
+}
+"""
