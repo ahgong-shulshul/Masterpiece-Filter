@@ -17,6 +17,7 @@ def test(request):
     if request.method == 'GET':
         return Response({'please': 'sadfasdfasd'})
 
+# JsonResponse 와 그냥 Response?
 
 class FeedList(APIView):
     def get(self, request):
@@ -67,7 +68,6 @@ class FeedDetail(APIView):
         return Response({"msg": "deleted!"})
 
 
-
 """
 @api_view(['GET'])
 def feed_list(request):
@@ -111,6 +111,3 @@ def feed_list(request):
     "post_date": "2023-11-01T00:00:00Z"
 }
 """
-
-
-# class FeedDetail():
