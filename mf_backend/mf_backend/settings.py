@@ -23,6 +23,7 @@ ALLOWED_HOSTS = ["*"]
 INSTALLED_APPS = [
     'feed',
     'accountapp',
+    'logintest',
 
     'django.contrib.admin',
     'django.contrib.auth',

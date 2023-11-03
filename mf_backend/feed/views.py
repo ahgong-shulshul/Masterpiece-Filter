@@ -33,6 +33,58 @@ class FeedList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+class FeedList2(APIView):
+    def get(self, request, user_id):
+        feed = Feed.objects.filter(user_id=user_id)
+        serializer = FeedSerializer(feed, many=True)
+        # if serializer.is_valid():
+        #     return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+
+
+"""
+class FeedList2(APIView):
+    def get(self, request, user_id):
+        try:
+            feed = Feed.objects.all(user_id=user_id)
+            serializer = FeedSerializer(feed, many=True)
+            # obj = Feed.objects.get(user_id=user_id)
+        except Feed.DoesNotExist:
+            msg = {"msg": "not found"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = FeedSerializer(obj)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+"""
+
+"""
+    def put(self, request, id):
+        try:
+            obj = Feed.objects.get(post_id=id)
+        except Feed.DoesNotExist:
+            msg = {"msg": "not found error"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = FeedSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        try:
+            obj = Feed.objects.get(post_id=id)
+        except Feed.DoesNotExist:
+            msg = {"msg": "not found error"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+        obj.delete()
+        return Response({"msg": "deleted!"})
+"""
+
+
+# user_id 적용하여 데이터 조회
 class FeedDetail(APIView):
     def get(self, request, id):
         try:
@@ -65,7 +117,6 @@ class FeedDetail(APIView):
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
         obj.delete()
         return Response({"msg": "deleted!"})
-
 
 
 """
