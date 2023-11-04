@@ -1,4 +1,7 @@
 from django.db import models
+# from logintest.models import Logintest
+
+from logintest.models import Logintest
 
 # 유저 아이디 임포트(accountapp? 하여튼 그 클래스)
 # from users.models import User
@@ -10,7 +13,7 @@ class Feed(models.Model):
     post_des = models.TextField()
     post_image = models.URLField()
     post_date = models.DateTimeField()
-    # user_id = models.ForeignKey(User, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(Logintest, on_delete=models.CASCADE)
 
 
 """
