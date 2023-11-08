@@ -8,6 +8,8 @@ from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework import viewsets
 
+from django.contrib.auth.decorators import login_required
+
 from .serializer import FeedSerializer
 from .models import Feed
 
@@ -19,12 +21,16 @@ def test(request):
 
 # JsonResponse 와 그냥 Response?
 
+
 class FeedList(APIView):
     def get(self, request):
         feed = Feed.objects.all()
         serializer = FeedSerializer(feed, many=True)
         return JsonResponse(serializer.data, status=status.HTTP_200_OK, safe=False)
 
+    ## 미이이이친 이거 사용자 인증 설정 해서 post 되게금 하기
+
+    @login_required
     def post(self, request):
         # data = JSONParser().parse(request)
         serializer = FeedSerializer(data=request.data)
@@ -35,9 +41,9 @@ class FeedList(APIView):
 
 
 class FeedDetail(APIView):
-    def get(self, request, id):
+    def get(self, request, post_id):
         try:
-            obj = Feed.objects.get(post_id=id)
+            obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
             msg = {"msg": "not found"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
@@ -45,9 +51,10 @@ class FeedDetail(APIView):
         serializer = FeedSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    def put(self, request, id):
+    @login_required
+    def put(self, request, post_id):
         try:
-            obj = Feed.objects.get(post_id=id)
+            obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
             msg = {"msg": "not found error"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
@@ -58,9 +65,10 @@ class FeedDetail(APIView):
             return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, id):
+    @login_required
+    def delete(self, request, post_id):
         try:
-            obj = Feed.objects.get(post_id=id)
+            obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
             msg = {"msg": "not found error"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
@@ -72,79 +80,23 @@ class FeedDetail(APIView):
 # user_id 적용하여 데이터 조회
 
 
-class FeedList2(APIView):
+class UsersFeedList(APIView):
     def get(self, request, user_id):
         feed = Feed.objects.filter(user_id=user_id)
         serializer = FeedSerializer(feed, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
-class FeedDetail2(APIView):
-    def get(self, request, user_id, id):
+class UsersFeedDetail(APIView):
+    def get(self, request, user_id, post_id):
         try:
-            obj = Feed.objects.get(user_id=user_id, post_id=id)
+            obj = Feed.objects.get(user_id=user_id, post_id=post_id)
         except Feed.DoesNotExist:
             msg = {"msg": "not found"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
         serializer = FeedSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def put(self, request, user_id, id):
-        try:
-            obj = Feed.objects.get(user_id=user_id, post_id=id)
-        except Feed.DoesNotExist:
-            msg = {"msg": "not found error"}
-            return Response(msg, status=status.HTTP_404_NOT_FOUND)
-
-        serializer = FeedSerializer(obj, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, user_id, id):
-        try:
-            obj = Feed.objects.get(user_id=user_id, post_id=id)
-        except Feed.DoesNotExist:
-            msg = {"msg": "not found error"}
-            return Response(msg, status=status.HTTP_404_NOT_FOUND)
-        obj.delete()
-        return Response({"msg": "deleted!"})
-
-
-"""
-@api_view(['GET'])
-def feed_list(request):
-    feed = Feed.objects.all()
-    # print(feed)
-    serializer = FeedSerializer(feed, many=True)
-    print(serializer.data)
-    return JsonResponse(serializer.data, safe=False)
-
-
-@api_view(['POST'])
-def feed_create(request):
-    data = JSONParser().parse(request)
-    serializer = FeedSerializer(feed, data=data)
-    serializer.save()
-    return JsonResponse(serializer.data)
-"""
-
-"""
-# Feed 의 목록
-def feed_list(request):
-    if request.method == 'GET':
-        feed = Feed.objects.all()
-        # print(feed)
-        serializer = FeedSerializer(feed, many=True)
-        print(serializer.data)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        # 추가 작성
-"""
 
     
 """
