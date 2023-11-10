@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 # from logintest.models import Logintest
 
 from logintest.models import Logintest

@@ -67,13 +67,16 @@ class FeedDetail(APIView):
 
     @login_required
     def delete(self, request, post_id):
-        try:
-            obj = Feed.objects.get(post_id=post_id)
-        except Feed.DoesNotExist:
-            msg = {"msg": "not found error"}
-            return Response(msg, status=status.HTTP_404_NOT_FOUND)
-        obj.delete()
-        return Response({"msg": "deleted!"})
+        if Feed.user_id == request.user:
+            try:
+                obj = Feed.objects.get(post_id=post_id)
+            except Feed.DoesNotExist:
+                msg = {"msg": "not found error"}
+                return Response(msg, status=status.HTTP_404_NOT_FOUND)
+            obj.delete()
+            return Response({"msg": "deleted!"})
+
+        return Response({"msg": "no permission to delete"})
 
 
 #####################################################################
