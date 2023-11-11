@@ -9,5 +9,6 @@ urlpatterns = [
     path('accountapp/', include('accountapp.urls')),
     path('logintest/', include('logintest.urls')),
 
+    path('customuser/', include('customuser.urls')),
     path('feed/', include('feed.urls')),
 ]

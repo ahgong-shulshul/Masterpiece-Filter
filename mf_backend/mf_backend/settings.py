@@ -33,6 +33,7 @@ INSTALLED_APPS = [
     'feed',
     'accountapp',
     'logintest',
+    'customuser',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -52,6 +53,8 @@ INSTALLED_APPS = [
     # provider
     'allauth.socialaccount.providers.google',
 ]
+
+AUTH_USER_MODEL = 'customuser'
 
 MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
