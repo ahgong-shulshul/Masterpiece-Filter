@@ -31,7 +31,7 @@ ALLOWED_HOSTS = ["*"]
 
 INSTALLED_APPS = [
     'feed',
-    'accountapp',
+    # 'accountapp',
     'logintest',
     'customuser',
 
@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     'rest_framework',
+    'rest_framework.authtoken',
 
     # allauth
     'allauth',
@@ -54,7 +55,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount.providers.google',
 ]
 
-AUTH_USER_MODEL = 'customuser'
+AUTH_USER_MODEL = 'customuser.CustomUser'
 
 MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
@@ -69,6 +70,12 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'mf_backend.urls'
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+}
 
 TEMPLATES = [
     {
