@@ -43,7 +43,7 @@ class FeedList(APIView):
 
 
 class FeedDetail(APIView):
-    @user_is_owner
+    # @user_is_owner
     def get(self, request, post_id):
         try:
             obj = Feed.objects.get(post_id=post_id)
