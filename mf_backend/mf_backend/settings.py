@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     # 'accountapp',
     'logintest',
     'customuser',
+    'customtoken',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -56,6 +57,7 @@ INSTALLED_APPS = [
 ]
 
 AUTH_USER_MODEL = 'customuser.CustomUser'
+AUTH_TOKEN_MODEL = 'customtoken.CustomUserToken'
 
 MIDDLEWARE = [
     'allauth.account.middleware.AccountMiddleware',
@@ -73,7 +75,8 @@ ROOT_URLCONF = 'mf_backend.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',
+        # 'rest_framework.authentication.TokenAuthentication',
+        'customtoken.authentication.CustomTokenAuthentication',
     ],
 }
 

@@ -1,9 +1,12 @@
 import json
 
 from django.contrib.auth import authenticate, login
+from customtoken.authentication import CustomTokenAuthentication
 from django.shortcuts import render
 from rest_framework import status
 from rest_framework.authtoken.models import Token
+
+# from customtoken.models import CustomUserToken
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -46,11 +49,30 @@ class SocialLoginAPIView(APIView):
             print("이게 다르다고?:", user_data['email'])
             print(user)
             if user is not None:
-                login(request, user)
-                token, created = Token.objects.get_or_create(user=user)
+                print("user is not None 안으로 들어옴")
+
+                try:
+                    login(request, user)
+                except:
+                    print("login 동작 안함")
+
+                print("체크1")
+                token, created = Token.objects.get_or_create(user_id=user.id)     # 이게 안되는데
+                print("체크2")
                 return Response({'token': token.key})
             else:
                 return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
 
         except json.JSONDecodeError:
             return Response({'error': 'Invalid JSON format'}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class SocialLoginAPITest(APIView):
+    def post(self, request):
+        user_data = json.loads(request.body.decode('utf-8'))
+        user, created = CustomUser.objects.get_or_create(username=user_data['email'])
+        print(user)
+        print(created)
+        token, created = Token.objects.get_or_create(user_id=user.id)
+        print(token)
+        print(created)
