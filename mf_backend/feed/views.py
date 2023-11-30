@@ -6,12 +6,15 @@ from rest_framework import status
 from rest_framework import viewsets
 
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 from .serializer import FeedSerializer
 from .models import Feed
 
 from customuser.decorators import user_is_owner
 from customuser.decorators import user_is_author
+
+from customuser.models import CustomUser
 
 
 @api_view()
@@ -31,8 +34,8 @@ class FeedList(APIView):
 
     ## 미이이이친 이거 사용자 인증 설정 해서 post 되게금 하기
 
-    @login_required
-    @user_is_owner
+    # @login_required
+    # @user_is_owner
     def post(self, request):
         # data = JSONParser().parse(request)
         serializer = FeedSerializer(data=request.data)
@@ -44,8 +47,11 @@ class FeedList(APIView):
 
 class FeedDetail(APIView):
     # @user_is_owner
-    @login_required
+    # @login_required
     def get(self, request, post_id):
+        print(request.user)
+        print(request.auth)
+
         try:
             obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
@@ -55,7 +61,7 @@ class FeedDetail(APIView):
         serializer = FeedSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    @login_required
+    # @login_required
     @user_is_author
     def put(self, request, post_id):
         try:
@@ -109,11 +115,20 @@ class UsersFeedDetail(APIView):
 
     
 """
+# post 내부의 데이터
 {
     "post_id": 3,
     "post_title": "testing!!!",
     "post_des": "using postman to test API!!!!",
     "post_image": "https://min02choi.github.io/assets/mypic.jpg",
-    "post_date": "2023-11-01T00:00:00Z"
+    "post_date": "2023-11-01T00:00:00Z",
+    "user_id": 36
+}
+
+# 플러터에서 장고에 로그일을 요청할 때의 json
+{
+    "email": "test36@example",
 }
 """
+
+

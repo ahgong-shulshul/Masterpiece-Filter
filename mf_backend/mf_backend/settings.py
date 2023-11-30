@@ -75,8 +75,8 @@ ROOT_URLCONF = 'mf_backend.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
-        # 'rest_framework.authentication.TokenAuthentication',
-        'customtoken.authentication.CustomTokenAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+        # 'customtoken.authentication.CustomTokenAuthentication',
     ],
 }
 

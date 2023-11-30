@@ -1,5 +1,6 @@
 import json
 
+from django.contrib import auth
 from django.contrib.auth import authenticate, login
 from customtoken.authentication import CustomTokenAuthentication
 from django.shortcuts import render
@@ -52,9 +53,10 @@ class SocialLoginAPIView(APIView):
                 print("user is not None 안으로 들어옴")
 
                 try:
-                    login(request, user)
+                    auth.login(request, user)
                 except:
                     print("login 동작 안함")
+                print(user.is_authenticated)
 
                 print("체크1")
                 token, created = Token.objects.get_or_create(user_id=user.id)     # 이게 안되는데
@@ -76,3 +78,9 @@ class SocialLoginAPITest(APIView):
         token, created = Token.objects.get_or_create(user_id=user.id)
         print(token)
         print(created)
+
+
+class LoginTest(APIView):
+    def get(self, request):
+        print(auth.get_user())
+
