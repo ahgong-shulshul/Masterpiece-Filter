@@ -2,6 +2,8 @@ import json
 
 from django.contrib import auth
 from django.contrib.auth import authenticate, login
+from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 from customtoken.authentication import CustomTokenAuthentication
 from django.shortcuts import render
 from rest_framework import status
@@ -12,6 +14,10 @@ from rest_framework.authtoken.models import Token
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import CustomUser
+
+from .serializers import CustomUserSerializer
+
+from .decorators import user_is_author
 
 
 class SocialLoginAPIView(APIView):
@@ -69,6 +75,7 @@ class SocialLoginAPIView(APIView):
             return Response({'error': 'Invalid JSON format'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class SocialLoginAPITest(APIView):
     def post(self, request):
         user_data = json.loads(request.body.decode('utf-8'))
@@ -84,3 +91,10 @@ class LoginTest(APIView):
     def get(self, request):
         print(auth.get_user())
 
+
+class UsersList(APIView):
+    @method_decorator(login_required)
+    def get(self, request):
+        users = CustomUser.objects.exclude(username=request.user)
+        serializer = CustomUserSerializer(users, many=True)
+        return Response(serializer.data)
