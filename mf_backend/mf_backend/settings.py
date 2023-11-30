@@ -150,7 +150,7 @@ SOCIALACCOUNT_PROVIDERS = {
 
 LANGUAGE_CODE = 'en-us'
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 

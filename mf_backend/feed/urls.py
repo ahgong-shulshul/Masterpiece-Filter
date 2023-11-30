@@ -8,5 +8,5 @@ urlpatterns = [
     path('<int:post_id>/', FeedDetail.as_view()),
 
     path('<int:user_id>/post/', UsersFeedList.as_view()),
-    path('<int:user_id>/post/{post_id}/', UsersFeedDetail.as_view()),
+    path('<int:user_id>/post/<int:post_id>/', UsersFeedDetail.as_view()),
 ]

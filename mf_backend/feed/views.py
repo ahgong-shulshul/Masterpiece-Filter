@@ -1,7 +1,7 @@
+from django.utils.decorators import method_decorator
 from rest_framework.response import Response
 from rest_framework.parsers import JSONParser
 from rest_framework.views import APIView
-from rest_framework.decorators import api_view
 from rest_framework import status
 from rest_framework import viewsets
 
@@ -16,38 +16,55 @@ from customuser.decorators import user_is_author
 
 from customuser.models import CustomUser
 
-
-@api_view()
-def test(request):
-    if request.method == 'GET':
-        return Response({'please': 'sadfasdfasd'})
-
-# JsonResponse 와 그냥 Response?
-# DRF에서 제공하는 Response 사용할 것
+import json
 
 
 class FeedList(APIView):
+    @method_decorator(login_required, name='dispatch')
     def get(self, request):
-        feed = Feed.objects.all()
-        serializer = FeedSerializer(feed, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        print(request.user)
+        cur_user = request.user
+        print(cur_user)
+        # feed = Feed.objects.all()
+        feed = Feed.objects.filter(user_id=cur_user)
+        if feed.exists():
+            serializer = FeedSerializer(feed, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            msg = {"msg": "No Feed"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
-    ## 미이이이친 이거 사용자 인증 설정 해서 post 되게금 하기
 
-    # @login_required
-    # @user_is_owner
+    # 두 개의 json 함치기 위해선 두개의 데이터를 dict형태로 바꾸고 dict를 합친 뒤, 합친 dict를 json으로 바꾸어주어야 함
+
+    @method_decorator(login_required, name='dispatch')
     def post(self, request):
-        # data = JSONParser().parse(request)
-        serializer = FeedSerializer(data=request.data)
+        cur_user_id = str(request.user.id)      # str 안하면 객체임
+        make_userid = '{"user_id": "' + cur_user_id + '"}'
+        dict_userid = json.loads(make_userid)       # dict 로 변경
+
+        dict_request = request.data
+        combined_dict = {**dict_request, **dict_userid}
+        # print(combined_dict)
+        # combined_json = json.dumps(combined_dict)
+        # print(combined_json)
+
+        serializer = FeedSerializer(data=combined_dict)     # dict 전달
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class FeedDetail(APIView):
-    # @user_is_owner
-    # @login_required
+class FeedDetail(LoginRequiredMixin, APIView):
+    # /accounts/login/ 으로 리다이렉트 해줌
+    def dispatch(self, request, *args, **kwargs):
+        # 부모 클래스의 dispatch 메소드 호출
+        response = super().dispatch(request, *args, **kwargs)
+        # 만약 로그인되지 않은 경우, LoginRequiredMixin이 리디렉션을 처리할 것이다.
+        return response
+
+    @method_decorator(login_required, name='dispatch')
     def get(self, request, post_id):
         print(request.user)
         print(request.auth)
@@ -61,8 +78,8 @@ class FeedDetail(APIView):
         serializer = FeedSerializer(obj)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
-    # @login_required
-    @user_is_author
+    # @user_is_author
+    @method_decorator(user_is_author, name='dispatch')
     def put(self, request, post_id):
         try:
             obj = Feed.objects.get(post_id=post_id)
@@ -76,8 +93,7 @@ class FeedDetail(APIView):
             return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @login_required
-    @user_is_author
+    @method_decorator(user_is_author, name='dispatch')
     def delete(self, request, post_id):
         if Feed.user_id == request.user:
             try:
@@ -125,7 +141,18 @@ class UsersFeedDetail(APIView):
     "user_id": 36
 }
 
-# 플러터에서 장고에 로그일을 요청할 때의 json
+## Feed 모델 조금 수정함
+- id: auto 증가
+- date: 현재날짜로 설정
+- user_id: 현재 로그인한 user로 저장(token으로 전달)
+{
+    "post_title": "testing!!!",
+    "post_des": "using postman to test API!!!!",
+    "post_image": "https://min02choi.github.io/assets/mypic.jpg",
+}
+
+
+# 플러터에서 장고에 로그인을 요청할 때의 json
 {
     "email": "test36@example",
 }

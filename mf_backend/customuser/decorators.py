@@ -5,6 +5,7 @@ from django.views import View
 
 
 from feed.models import Feed
+from .models import CustomUser
 
 # from feed.views import FeedDetail
 
@@ -31,17 +32,20 @@ def user_is_owner(view_func):
     return wrapper
 
 
+# user_is_author: 현재 사용자(user)가 해당 게시글의 작성자(author)인지 확인
 def user_is_author(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         post_id = kwargs.get("post_id")
-        feed = Feed.objects.get(post_id=post_id)
+        # print("post_id: ", post_id)
+        feed = Feed.objects.get(post_id=post_id)        # 해당 포스트 번호의 아이디를 받아
         print("???: ", feed.user_id)        # 사용자의 이메일이 반환됨
-        print("asdfasdf")
-        print(request)                      # FeedDetail 뷰 객체가 넘어옴
+        print(request)
+        print(request.user)
+        print(request.user.id)
         # 현재 요청한 사용자와 게시글 작성자의 아이디 비교
-        if request.user.id == feed.user_id:     # 주의
-            return view_func(request, post_id, *args, **kwargs)
+        if request.user == feed.user_id:     # 주의
+            return view_func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden("Permission Denied: You are not the author of this post.")
 
