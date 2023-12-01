@@ -19,11 +19,10 @@ class Feed(models.Model):
 
 
 """
+플러터에서 받아야 할 json data 형태
 {
-    "post_id": 3,
     "post_title": "testing",
     "post_des": "using postman to test API",
-    "post_image": "testing.png",
-    "post_date": "2023-11-01"
+    "post_image": "https://min02choi.github.io/assets/mypic.jpg"
 }
 """

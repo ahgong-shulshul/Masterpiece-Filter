@@ -1,14 +1,7 @@
 from functools import wraps
-from django.http import HttpResponseForbidden
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views import View
-
+from django.http import HttpResponseForbidden, HttpResponse
 
 from feed.models import Feed
-from .models import CustomUser
-
-# from feed.views import FeedDetail
-
 
 # user_is_owner: 현재 사용자(user)가 해당 게시글의 작성자인지 확인
 
@@ -16,19 +9,13 @@ def user_is_owner(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         # 현재 로그인한 사용자와 요청된 사용자를 가져오기
-        print(request.user)
         current_user = request.user
-        print(current_user)
         requested_user_id = int(request.GET.get('user_id'))
-        print(requested_user_id)
-
         # 사용자가 다르면 권한이 없음을 반환
         if current_user.id != requested_user_id:
             return HttpResponseForbidden("Permission Denied: You are not the owner of this resource.")
-
         # 사용자가 같으면 원래의 뷰 함수를 실행
         return view_func(request, *args, **kwargs)
-
     return wrapper
 
 
@@ -37,9 +24,11 @@ def user_is_author(view_func):
     @wraps(view_func)
     def wrapper(request, *args, **kwargs):
         post_id = kwargs.get("post_id")
-        # print("post_id: ", post_id)
-        feed = Feed.objects.get(post_id=post_id)        # 해당 포스트 번호의 아이디를 받아
-        print("???: ", feed.user_id)        # 사용자의 이메일이 반환됨
+        try:
+            feed = Feed.objects.get(post_id=post_id)        # 해당 포스트 번호의 아이디를 받아
+        except Feed.DoesNotExist:
+            # return HttpResponse({"msg": "Feed does not exist."})
+            return HttpResponse("Error: Feed does not exist.")
         print(request)
         print(request.user)
         print(request.user.id)
@@ -48,8 +37,4 @@ def user_is_author(view_func):
             return view_func(request, *args, **kwargs)
         else:
             return HttpResponseForbidden("Permission Denied: You are not the author of this post.")
-
     return wrapper
-
-
-#
