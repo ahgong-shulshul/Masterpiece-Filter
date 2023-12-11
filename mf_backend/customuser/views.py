@@ -49,3 +49,52 @@ class UsersList(APIView):
         users = CustomUser.objects.exclude(username=request.user)
         serializer = CustomUserSerializer(users, many=True)
         return Response(serializer.data)
+
+
+class UserDetail(APIView):
+    @method_decorator(login_required, name='dispatch')
+    def get(self, request):
+        cur_user = request.user
+        print(request.user)         # username
+        print(request.user.email)   # email
+        cususer = CustomUser.objects.filter(username=cur_user)
+        if cususer.exists():
+            serializer = CustomUserSerializer(cususer, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        else:
+            msg = {"msg": "User not found error"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+
+    # 플러터에서 이메일 변경 안되게 막을것. username을 바꿀것
+    # username이 unique라서 괜찮을수도
+    @method_decorator(login_required, name='dispatch')
+    def put(self, request):
+        cur_user = request.user
+        try:
+            obj = CustomUser.objects.get(username=cur_user)
+        except CustomUser.DoesNotExist:
+            msg = {"msg": "User not found error"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+        serializer = CustomUserSerializer(obj, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @method_decorator(login_required, name='dispatch')
+    def delete(self, request):
+        cur_user = request.user
+        try:
+            obj = CustomUser.objects.get(username=cur_user)
+        except CustomUser.DoesNotExist:
+            msg = {"msg": "User not found error"}
+            return Response(msg, status=status.HTTP_404_NOT_FOUND)
+        obj.delete()
+        return Response({"msg": "deleted!"})
+
+
+"""
+{
+    "username": "Choi Min Young"
+}
+"""

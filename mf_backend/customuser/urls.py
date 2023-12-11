@@ -1,8 +1,9 @@
 from django.urls import path
-from .views import SocialLoginAPIView, UsersList
+from .views import SocialLoginAPIView, UsersList, UserDetail
 
 
 urlpatterns = [
     path('social-login/', SocialLoginAPIView.as_view()),
     path('list/', UsersList.as_view()),
+    path('mypage/', UserDetail.as_view()),
 ]

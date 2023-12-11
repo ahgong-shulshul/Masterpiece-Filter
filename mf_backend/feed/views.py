@@ -128,20 +128,20 @@ class UsersFeedDetail(APIView):
     "user_id": 36
 }
 
-# Feed 모델 조금 수정함(아래 데이터 + header에 토큰값을 장고에request)
+# Feed 모델 조금 수정함(아래 데이터 + header에 토큰 값을 장고에 request)
 - id: auto 증가
 - date: 현재날짜로 설정
 - user_id: 현재 로그인한 user로 저장(token으로 전달)
 {
     "post_title": "testing!!!",
     "post_des": "using postman to test API!!!!",
-    "post_image": "https://min02choi.github.io/assets/mypic.jpg",
+    "post_image": "https://min02choi.github.io/assets/mypic.jpg"
 }
 
 
-# 플러터에서 장고에 로그인을 요청할 때의 json
+# 플러터에서 장고에 로그인/회원가입을 요청할 때의 json
 {
-    "email": "test36@example",
+    "email": "test36@example.com"
 }
 """
 
