@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/Home.dart';
+import 'package:path_provider/path_provider.dart';
 import './filter.dart';
 
 class ShowResultPage extends StatefulWidget {
@@ -28,6 +29,27 @@ class _ShowResultPageState extends State<ShowResultPage> {
             child: widget._image == null
                 ? Text('Take Image')
                 : Image.file(File(widget._image!.path))));
+  }
+
+  // 이미지를 기기에 저장하는 함수
+  Future<void> saveImageToDevice() async {
+    if (widget._image != null) {
+      final directory = await getExternalStorageDirectory();  // 저장 경로 설정 (getExternalStorageDirectory()는 외부 저장소 경로를 제공합니다.)
+      final imagePath = '${directory!.path}/my_image.jpg';
+
+      // 이미지를 저장 경로로 복사합니다.
+      await File(widget._image!.path).copy(imagePath);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("이미지가 기기에 저장되었습니다."),),
+      );
+      print("saved image to: " + imagePath);
+
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("이미지가 없습니다."),),
+      );
+    }
   }
 
   @override
@@ -92,12 +114,8 @@ class _ShowResultPageState extends State<ShowResultPage> {
                           fontFamily: "Bradley Hand ITC"
                       ),
                     ),
-                    onPressed: () {
-                      // 기기에 저장하는 코드
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("picture is saved"),),
-                      );
-                    },
+                    onPressed: saveImageToDevice,
+
                   ),
 
                   //SizedBox(width: 10)

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:into_the_masterpiece/camera.dart';
 import 'package:into_the_masterpiece/gallery.dart';
+import 'login.dart';
 
 class HomePage extends StatefulWidget {
   HomePage({Key? key}) : super(key: key);
@@ -80,7 +81,7 @@ class _HomePageState extends State<HomePage> {
               backgroundColor: Color.fromARGB(255, 247, 249, 251),
               onPressed: () {
                 Navigator.push(
-                    context, MaterialPageRoute(builder: (_) => CameraExe()));
+                    context, MaterialPageRoute(builder: (_) => LoginExe()));
               },
             ),
           ]
