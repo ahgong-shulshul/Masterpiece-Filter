@@ -2,7 +2,10 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/login.dart';
 import 'package:into_the_masterpiece/showResult.dart';
+import 'package:into_the_masterpiece/token_manager.dart';
+import 'package:into_the_masterpiece/userpage.dart';
 import './filter.dart';
 
 class CameraExe extends StatefulWidget {
@@ -87,9 +90,17 @@ class _CameraExeState extends State<CameraExe> {
                   icon: Icon(Icons.person),
                   onPressed: () {
                     // 사용자 계정으로 이동(로그인 유무 생각)
-                    // Navigator.push(
-                    //   context, MaterialPageRoute(builder: (context) => const NextScreen()),
-                    // );
+                    if(TokenManager.loadToken() != null){
+                      Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => UserPage()),
+                      );
+                    }
+                    else{
+                      Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => LoginExe()),
+                      );
+                    }
+
                   },
                 ),
                 Spacer(),
