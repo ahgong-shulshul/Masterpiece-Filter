@@ -79,6 +79,7 @@ class _LoginExeState extends State<LoginExe> {
     switch (_loginPlatform) {
       case LoginPlatform.google:
         await GoogleSignIn().signOut();
+        _loginPlatform = LoginPlatform.none;
         break;
       case LoginPlatform.kakao:
         break;
@@ -99,7 +100,7 @@ class _LoginExeState extends State<LoginExe> {
       body: Center(
           child: _loginPlatform != LoginPlatform.none
               ? ForLoggedInUser()
-              : Row(
+              : Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
@@ -108,19 +109,22 @@ class _LoginExeState extends State<LoginExe> {
                       Navigator.pop(context);
                     }
                   ),
-                  SizedBox(width: 40),
+                  SizedBox(height: 30),
 
                   _loginButton(
                     'assets/google.png',
                     signInWithGoogle,
                   ),
 
-                  SizedBox(width: 40),
+                  SizedBox(height: 30),
 
                   _loginButton(
                     'assets/naver.png',
                     signInWithNaver,
                   ),
+
+                  SizedBox(height: 30),
+                  _logoutButton(),
                 ],
               )),
     );

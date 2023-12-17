@@ -8,4 +8,5 @@ enum LoginPlatform{
 enum SettingMenu{
   changeBGImg,
   changProfileImg,
+  goHome,
 }

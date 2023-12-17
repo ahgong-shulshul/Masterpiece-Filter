@@ -1,9 +1,12 @@
+import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/camera.dart';
 import 'package:into_the_masterpiece/enumdata.dart';
+import 'package:into_the_masterpiece/search_follower.dart';
 
 
 class UserPage extends StatefulWidget {
@@ -66,7 +69,10 @@ class _UserPageState extends State<UserPage> {
             child: IconButton(
               icon: Icon(Icons.search),
               onPressed: () {
-
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => SearchExe())
+                );
               },
             ),
           ),
@@ -74,7 +80,7 @@ class _UserPageState extends State<UserPage> {
           // 사진 찍기 버튼
           Positioned(
             top: 30.0,
-            right: 80.0,
+            right: 90.0,
             child: IconButton(
               icon: Icon(Icons.camera),
               onPressed: () {
@@ -98,6 +104,10 @@ class _UserPageState extends State<UserPage> {
                 else if(res == SettingMenu.changProfileImg){
                   getProfileImage(ImageSource.gallery);
                 }
+                else{
+                  Navigator.push(
+                      context, MaterialPageRoute(builder: (context) => HomePage()));
+                }
               },
               itemBuilder: (BuildContext context){
                 return [
@@ -108,6 +118,10 @@ class _UserPageState extends State<UserPage> {
                   PopupMenuItem(
                     value: SettingMenu.changProfileImg,
                     child: Text("프로필 변경"),
+                  ),
+                  PopupMenuItem(
+                    value: SettingMenu.goHome,
+                    child: Text("홈으로"),
                   ),
                 ];
               },
@@ -169,9 +183,9 @@ class _UserPageState extends State<UserPage> {
                 // 유저 닉네임
                 SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
-                  'UserName',
+                  '1004jumto',
                   style: TextStyle(
-                    fontSize: 24.0,
+                    fontSize: 20.0,
                     color: Colors.black,
                   ),
                 ),
@@ -179,9 +193,9 @@ class _UserPageState extends State<UserPage> {
                 // 포스팅 개수
                 SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
-                  'PostSum',
+                  '20posts',
                   style: TextStyle(
-                    fontSize: 24.0,
+                    fontSize: 20.0,
                     color: Colors.black,
                   ),
                 ),

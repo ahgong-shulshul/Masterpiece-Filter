@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/showResult.dart';
-import './filter.dart';
+import 'package:path_provider/path_provider.dart';
 
 class GalleryExe extends StatefulWidget {
   const GalleryExe({Key? key}) : super(key: key);
@@ -39,6 +39,50 @@ class _GalleryExeState extends State<GalleryExe> {
             child: _image == null
                 ? Text('Take Image')
                 : Image.file(File(_image!.path))));
+  }
+
+  void changeImage(String imgPath) async{
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String filePath = '${appDocDir.path}/AfterImg2.jpg';
+
+    setState(() {
+      _image = File(filePath);
+    });
+  }
+
+  ///////////// 필터 칸
+  final List<Image> filters = <Image>[
+    Image.asset("assets/monk.jpg", fit: BoxFit.fill,),
+    Image.asset("assets/splash.png", fit: BoxFit.fill,),
+    Image.asset("assets/wave.jpg", fit: BoxFit.fill,),
+    Image.asset("assets/tmp4.png", fit: BoxFit.fill,),
+    Image.asset("assets/tmp1.png", fit: BoxFit.fill,),
+    Image.asset("assets/splash.png", fit: BoxFit.fill,),
+    Image.asset("assets/tmp3.png", fit: BoxFit.fill,),
+    Image.asset("assets/tmp4.png", fit: BoxFit.fill,)];
+
+  Widget listview_builder(){
+    return ListView.builder(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.all(2),
+      itemCount: filters.length,
+      itemBuilder: (BuildContext context, int index){
+        return InkWell(
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(28.0), // 원하는 둥근 정도 설정
+              child: Container(
+                child: filters[index],
+                width: MediaQuery.of(context).size.height * 0.2,
+                padding: EdgeInsets.all(4),
+              ),
+            ),
+            onTap: () => (
+                //filterNum = index
+                changeImage('assets/monkafter.jpg')
+            )
+        );
+      },
+    );
   }
 
   @override
