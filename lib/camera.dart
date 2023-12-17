@@ -60,7 +60,7 @@ class _CameraExeState extends State<CameraExe> {
 
   GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/cloud-platform']);
   GoogleSignInAccount? _currentUser;
-  String _bucketName = 'ml_tmp_empty_bucket'; // GCS 버킷 이름
+  String _bucketName = 'mf-content-images'; // GCS 버킷 이름
 
 
 
@@ -123,7 +123,7 @@ class _CameraExeState extends State<CameraExe> {
     }
   }
 
-  ///////////// 필터 칸
+  ///////////// 필터 칸 ///////////////////////////////////////////
   final List<Image> filters = <Image>[
     Image.asset("assets/monk.jpg", fit: BoxFit.fill,),
     Image.asset("assets/splash.png", fit: BoxFit.fill,),
@@ -149,10 +149,11 @@ class _CameraExeState extends State<CameraExe> {
                 padding: EdgeInsets.all(4),
               ),
             ),
-            onTap: () => (
-                //filterNum = index
-                changeImage('assets/monkafter.jpg')
-            )
+            onTap: () => {
+                filterNum = index,
+                print(filterNum),
+             //   changeImage('assets/monkafter.jpg')
+            }
         );
       },
     );
@@ -217,7 +218,7 @@ class _CameraExeState extends State<CameraExe> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     // 스토리지에 필터 인덱스와 함께 사진 업로드
-                    //_uploadImage(_image!.path, filterNum);
+                    _uploadImage(_image!.path, filterNum);
 
                     // 결과창으로 이동
                     Navigator.push(
