@@ -13,12 +13,12 @@ from .models import Feed
 from customuser.decorators import user_is_author
 
 
+# URL: feed
 class FeedList(APIView):
     @method_decorator(login_required, name='dispatch')
     def get(self, request):
-        print(request.user)
+        print(" >> 로그인 사용자: ", request.user)
         cur_user = request.user
-        print(cur_user)
         feed = Feed.objects.filter(user_id=cur_user)
         if feed.exists():
             serializer = FeedSerializer(feed, many=True)
@@ -28,9 +28,10 @@ class FeedList(APIView):
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
 
-    # 두 개의 json 함치기 위해선 두개의 데이터를 dict형태로 바꾸고 dict를 합친 뒤, 합친 dict를 json으로 바꾸어주어야 함
+    # 두 개의 json 함치기 위해선 두개의 데이터를 dict 형태로 바꾸고 dict를 합친 뒤, 합친 dict를 json으로 바꾸어주어야 함
     @method_decorator(login_required, name='dispatch')
     def post(self, request):
+        print(" >> 로그인 사용자: ", request.user)
         cur_user_id = str(request.user.id)      # str 안하면 객체임
         make_userid = '{"user_id": "' + cur_user_id + '"}'
         dict_userid = json.loads(make_userid)       # dict 로 변경
@@ -47,6 +48,7 @@ class FeedList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# URL: feed/{post_id}
 class FeedDetail(LoginRequiredMixin, APIView):
     # 로그인이 안 되어있을 시 /accounts/login/ 으로 리다이렉트 해줌
     def dispatch(self, request, *args, **kwargs):
@@ -57,8 +59,8 @@ class FeedDetail(LoginRequiredMixin, APIView):
 
     @method_decorator(login_required, name='dispatch')
     def get(self, request, post_id):
-        print(request.user)
-        print(request.auth)
+        print(" >> 로그인 사용자: ", request.user)    # username 반환
+        print(" >> 로그인 사용자: ", request.auth)    # 토큰값 반환
         try:
             obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
@@ -70,13 +72,22 @@ class FeedDetail(LoginRequiredMixin, APIView):
 
     @method_decorator(user_is_author, name='dispatch')
     def put(self, request, post_id):
+        cur_user_id = str(request.user.id)
+        print("this modified: ", cur_user_id)
+
+        make_userid = '{"user_id": "' + cur_user_id + '"}'
+        dict_userid = json.loads(make_userid)
+
+        dict_request = request.data
+        combined_dict = {**dict_request, **dict_userid}
+
         try:
             obj = Feed.objects.get(post_id=post_id)
         except Feed.DoesNotExist:
             msg = {"msg": "not found error"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
-        serializer = FeedSerializer(obj, data=request.data)
+        serializer = FeedSerializer(instance=obj, data=combined_dict)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
@@ -94,10 +105,10 @@ class FeedDetail(LoginRequiredMixin, APIView):
         if feed_author == request.user:
             obj.delete()
             return Response({"msg": "deleted!"})
-
         return Response({"msg": "no permission to delete"})
 
 
+# URL: feed/{user_id}/post
 class UsersFeedList(APIView):
     def get(self, request, user_id):
         feed = Feed.objects.filter(user_id=user_id)
@@ -105,6 +116,7 @@ class UsersFeedList(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
+# URL: feed/{user_id}/post/{post_id}
 class UsersFeedDetail(APIView):
     def get(self, request, user_id, post_id):
         try:

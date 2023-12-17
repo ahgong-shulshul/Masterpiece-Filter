@@ -30,7 +30,7 @@ INSTALLED_APPS = [
     # 'accountapp',
     'logintest',
     'customuser',
-    'customtoken',
+    # 'customtoken',
 
     'django.contrib.admin',
     'django.contrib.auth',
@@ -139,7 +139,6 @@ SOCIALACCOUNT_PROVIDERS = {
         }
     }
 }
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/

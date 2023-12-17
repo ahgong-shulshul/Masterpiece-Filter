@@ -13,6 +13,7 @@ from .models import CustomUser
 from .serializers import CustomUserSerializer
 
 
+# URL: customuser/social-login
 class SocialLoginAPIView(APIView):
     def post(self, request):
         try:
@@ -35,6 +36,8 @@ class SocialLoginAPIView(APIView):
                 auth.login(request, user)
                 print(user.is_authenticated)
                 token, created = Token.objects.get_or_create(user_id=user.id)     # 이게 안되는데
+                print(token.key)        # 확인
+                print(token)            # 확인
                 return Response({'token': token.key})
             else:
                 return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -43,6 +46,7 @@ class SocialLoginAPIView(APIView):
             return Response({'error': 'Invalid JSON format'}, status=status.HTTP_400_BAD_REQUEST)
 
 
+# URL: customuser/list
 class UsersList(APIView):
     @method_decorator(login_required)
     def get(self, request):
@@ -51,6 +55,7 @@ class UsersList(APIView):
         return Response(serializer.data)
 
 
+# URl: customuser/mypage
 class UserDetail(APIView):
     @method_decorator(login_required, name='dispatch')
     def get(self, request):
@@ -94,6 +99,12 @@ class UserDetail(APIView):
 
 
 """
+# 로그인 요청: 구글에서 인증받은 이메일을 전달
+{
+    "email": "min02choi@naver.com"
+}
+
+# 닉네임 변경할 때
 {
     "username": "Choi Min Young"
 }
