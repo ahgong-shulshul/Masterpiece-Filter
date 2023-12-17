@@ -78,6 +78,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
                   icon: Icon(Icons.arrow_back_ios_new),
                   onPressed: () {
                     //필터 고르는 화면으로 이동
+                    Navigator.pop(context);
                   },
                 ),
                 Spacer(),

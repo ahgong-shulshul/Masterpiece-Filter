@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/camera.dart';
 import 'package:into_the_masterpiece/enumdata.dart';
 
 
@@ -69,7 +70,22 @@ class _UserPageState extends State<UserPage> {
               },
             ),
           ),
-          
+
+          // 사진 찍기 버튼
+          Positioned(
+            top: 30.0,
+            right: 80.0,
+            child: IconButton(
+              icon: Icon(Icons.camera),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => CameraExe()),
+                );
+              },
+            ),
+          ),
+
           // 배경 사진 설정 버튼
           Positioned(
             top: 30.0,
@@ -85,11 +101,14 @@ class _UserPageState extends State<UserPage> {
               },
               itemBuilder: (BuildContext context){
                 return [
-                  for(final value in SettingMenu.values)
-                    PopupMenuItem(
-                      value: value,
-                      child: Text(value.toString()),
-                    )
+                  PopupMenuItem(
+                    value: SettingMenu.changeBGImg,
+                    child: Text("배경 변경"),
+                  ),
+                  PopupMenuItem(
+                    value: SettingMenu.changProfileImg,
+                    child: Text("프로필 변경"),
+                  ),
                 ];
               },
             ),

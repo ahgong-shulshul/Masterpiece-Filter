@@ -105,9 +105,8 @@ class _LoginExeState extends State<LoginExe> {
                   IconButton(
                     icon: Icon(Icons.arrow_back_ios_new),
                     onPressed: () {
-                      Navigator.push(
-                          context, MaterialPageRoute(builder: (_) => HomePage()));
-                    },
+                      Navigator.pop(context);
+                    }
                   ),
                   SizedBox(width: 40),
 
