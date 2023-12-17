@@ -4,3 +4,8 @@ enum LoginPlatform{
   naver,
   none,   // logout
 }
+
+enum SettingMenu{
+  changeBGImg,
+  changProfileImg,
+}

@@ -7,7 +7,7 @@ import 'package:google_sign_in/google_sign_in.dart';
 import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:into_the_masterpiece/userpage.dart';
-import 'login_platform.dart';
+import 'enumdata.dart';
 
 class LoginExe extends StatefulWidget{
   const LoginExe({Key? key}) :super(key: key);
