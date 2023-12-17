@@ -47,6 +47,7 @@ class SocialLoginAPIView(APIView):
 
 
 # URL: customuser/list
+# 본인은 제외한 목록이 나옴
 class UsersList(APIView):
     @method_decorator(login_required)
     def get(self, request):
@@ -60,9 +61,16 @@ class UserDetail(APIView):
     @method_decorator(login_required, name='dispatch')
     def get(self, request):
         cur_user = request.user
+        print("cur_user")
         print(request.user)         # username
         print(request.user.email)   # email
         cususer = CustomUser.objects.filter(username=cur_user)
+
+        user_instance = CustomUser.objects.get(username=request.user)
+        user_instance.update_total_posts()
+
+        print("user_instance: ", user_instance)
+
         if cususer.exists():
             serializer = CustomUserSerializer(cususer, many=True)
             return Response(serializer.data, status=status.HTTP_200_OK)
@@ -75,12 +83,28 @@ class UserDetail(APIView):
     @method_decorator(login_required, name='dispatch')
     def put(self, request):
         cur_user = request.user
+
+        user_instance = CustomUser.objects.get(username=request.user)
+        total_post = user_instance.update_total_posts()
+
+        print("total_post: ", total_post)
+        print("이건 되니?: ", user_instance.total_posts)
+        print("request.data: ", request.data)
+
+        # total_post를 request.data 에 합치는 과정
+        tot_posts_dic = '{"total_posts": "' + str(user_instance.total_posts) + '"}'
+        total_post = json.loads(tot_posts_dic)
+
+        dict_request = request.data
+        combined_dict = {**dict_request, **total_post}
+
         try:
             obj = CustomUser.objects.get(username=cur_user)
         except CustomUser.DoesNotExist:
             msg = {"msg": "User not found error"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
-        serializer = CustomUserSerializer(obj, data=request.data)
+        # serializer = CustomUserSerializer(obj, data=request.data)
+        serializer = CustomUserSerializer(obj, data=combined_dict)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
@@ -97,6 +121,16 @@ class UserDetail(APIView):
         obj.delete()
         return Response({"msg": "deleted!"})
 
+class TotalPost(APIView):
+    def get(self, request):
+        user_instance = CustomUser.objects.get(username=request.user)
+        user_instance.update_total_posts()
+        # obj = CustomUser.objects.get(username=request.user)
+        # serializer = CustomUserSerializer(obj, data=request.data)
+        serializer = CustomUserSerializer(request.user)
+        return Response(serializer.data)
+
+
 
 """
 # 로그인 요청: 구글에서 인증받은 이메일을 전달
@@ -106,6 +140,8 @@ class UserDetail(APIView):
 
 # 닉네임 변경할 때
 {
-    "username": "Choi Min Young"
+    "username": "Choi Min Young",
+    "profile_pic": "https://cdn.newspenguin.com/news/photo/202104/4406_13982_1239.jpg",
+    "background_pic": "https://pbs.twimg.com/media/Dky_NvgU8AAS3WO.jpg"
 }
 """
