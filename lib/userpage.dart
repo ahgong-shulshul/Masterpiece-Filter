@@ -20,8 +20,8 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
-
   UserPageData? userData;
+  UserPagePosts? userPosts;
 
   @override
   void initState() {
@@ -32,6 +32,7 @@ class _UserPageState extends State<UserPage> {
   Future<void> _loadUserData() async {
     try {
       userData = await ReceiveUserData();
+      userPosts = await ReceiveUserPosts();
       setState(() {}); // 상태를 갱신하여 위젯을 다시 그림
     } catch (e) {
       print('Error loading user data: $e');
@@ -39,15 +40,15 @@ class _UserPageState extends State<UserPage> {
   }
   // 받아와야할 것: 사용자 배경사진, 프로필사진, 이름, 게시물 수, 게시물 사진들
   Future<UserPageData> ReceiveUserData() async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/social-login/';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
-      final response = await http.post(
+      final response = await http.get(
         Uri.parse(apiUrl),
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
+          'Authorization': 'Token $token',
         },
       );
 
@@ -56,6 +57,37 @@ class _UserPageState extends State<UserPage> {
         final Map<String, dynamic> responseData = jsonDecode(response.body);
 
         return UserPageData.fromJson(responseData);
+      }
+      else {
+        print('데이터 얻기 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
+      }
+    }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
+
+  Future<UserPagePosts> ReceiveUserPosts() async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
+    String? token = await TokenManager.loadToken();
+
+    if(token != null){
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('데이터 통신 성공');
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        return UserPagePosts.fromJson(responseData);
       }
       else {
         print('데이터 얻기 실패');
@@ -303,7 +335,7 @@ class _UserPageState extends State<UserPage> {
                 ),
                   itemCount: userData!.postSum, // 그리드 아이템의 총 개수
                   itemBuilder: (context, index) {
-                    String imageUrl = userData!.postUrls[index];
+                    String imageUrl = userPosts!.postUrls[index];
                     return GestureDetector(
                       onTap: () {
                         _showImageDialog(imageUrl);

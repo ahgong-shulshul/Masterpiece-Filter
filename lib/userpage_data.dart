@@ -7,14 +7,14 @@ class UserPageData {
   String? background_picture;
   String? profile_picture;
   int postSum;
-  final List<String> postUrls;
+  //final List<String> postUrls;
 
   UserPageData({    // 생성자
     required this.username,
     required this.background_picture,
     required this.profile_picture,
     required this.postSum,
-    required this.postUrls
+    //required this.postUrls
   });
 /*
   Map<String, dynamic> toJson() => {
@@ -28,10 +28,25 @@ class UserPageData {
   factory UserPageData.fromJson(Map<String, dynamic> json) {
     return UserPageData(
       username: json['username'],
-      profile_picture: json['profile'],
-      background_picture: json['back_ground'],
-      postSum: json['postSum'],
-      postUrls: List<String>.from(json['postUrls'])
+      profile_picture: json['profile_pic'],
+      background_picture: json['background_pic'],
+      postSum: json['total_posts'],
+     // postUrls: List<String>.from(json['postUrls'])
+    );
+  }
+}
+
+class UserPagePosts {
+  final List<String> postUrls;
+
+  UserPagePosts({    // 생성자
+
+    required this.postUrls
+  });
+
+  factory UserPagePosts.fromJson(Map<String, dynamic> json) {
+    return UserPagePosts(
+         postUrls: List<String>.from(json['postUrls'])
     );
   }
 }
