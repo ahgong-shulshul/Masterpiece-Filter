@@ -30,48 +30,6 @@ class _SearchExeState extends State<SearchExe> {
     });
   }
 
-  // Widget _buildBody(BuildContext context) {
-  //   return StreamBuilder<QuerySnapshot>(
-  //     stream: Firestore.instance.collection('movie').snapshots(),
-  //     builder: (context, snapshot) {
-  //       if (!snapshot.hasData) return LinearProgressIndicator();
-  //       return _buildList(context, snapshot.data.documents);
-  //     },
-  //   );
-  // }
-
-  // Widget _buildList(BuildContext context, List<DocumentSnapshot> snapshot) {
-  //   List<DocumentSnapshot> searchResults = [];
-  //   for (DocumentSnapshot d in snapshot) {
-  //     if (d.data.toString().contains(_searchText)) {
-  //       searchResults.add(d);
-  //     }
-  //   }
-  //   return Expanded(
-  //     child: GridView.count(
-  //         crossAxisCount: 3,
-  //         childAspectRatio: 1 / 1.5,
-  //         padding: EdgeInsets.all(3),
-  //         children: searchResults
-  //             .map((data) => _buildListItem(context, data))
-  //             .toList()),
-  //   );
-  // }
-  //
-  // Widget _buildListItem(BuildContext context, DocumentSnapshot data) {
-  //   final movie = Movie.fromSnapshot(data);
-  //   return InkWell(
-  //     child: Image.network(movie.poster),
-  //     onTap: () {
-  //       Navigator.of(context).push(MaterialPageRoute<Null>(
-  //           fullscreenDialog: true,
-  //           builder: (BuildContext context) {
-  //             return DetailScreen(movie: movie);
-  //           }));
-  //     },
-  //   );
-  // }
-
   List<String> tempUserList = [
     "min02choi", "sooking87", "ye.ann926", "leeyjin", "yejio_oi", "hyn.zzi", "um_im_ss",
     "shynewshy", "to.kk.ii", "desert_f0g", "didiwr", "zimini55", "victory_hee", "moonchloe12",
@@ -86,6 +44,43 @@ class _SearchExeState extends State<SearchExe> {
     "assets/tmp1.png",
   ];
 
+  // Future<List<UserPagePosts>> ReceiveUserPosts() async {
+  //   final String apiUrl = 'http://10.0.2.2:8000/feed/';
+  //   String? token = await TokenManager.loadToken();
+  //
+  //   if(token != null){
+  //     final response = await http.get(
+  //       Uri.parse(apiUrl),
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //         'Authorization': 'Token $token',
+  //       },
+  //     );
+  //
+  //     if (response.statusCode == 200) {
+  //       print('데이터 통신 성공');
+  //       print(response.body);
+  //
+  //       // JSON 문자열을 파싱
+  //       final List<dynamic> responseData = jsonDecode(response.body);
+  //       print(responseData);
+  //
+  //       // 파싱된 데이터를 PostData 모델 객체의 리스트로 변환
+  //       List<UserPagePosts> userPosts = responseData.map((json) => UserPagePosts.fromJson(json)).toList();
+  //
+  //       return userPosts;
+  //     }
+  //     else {
+  //       print('데이터 얻기 실패');
+  //       print('HTTP Status Code: ${response.statusCode}');
+  //       throw Exception('Failed to fetch user data');
+  //     }
+  //   }
+  //   else {
+  //     print('토큰이 null입니다.');
+  //     throw Exception('Token is null');
+  //   }
+  // }
 
   Widget _buildList(BuildContext context, List<String> list) {
     List<String> searchResults = [];

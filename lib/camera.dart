@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:into_the_masterpiece/CloudApi.dart';
 import 'package:into_the_masterpiece/login.dart';
 import 'package:into_the_masterpiece/showResult.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
@@ -11,6 +12,8 @@ import 'package:into_the_masterpiece/userpage.dart';
 import 'package:http/http.dart' as http;
 import 'package:googleapis/storage/v1.dart' as storage;
 import 'package:path_provider/path_provider.dart';
+
+import 'enumdata.dart';
 
 class CameraExe extends StatefulWidget {
   const CameraExe({Key? key}) : super(key: key);
@@ -23,8 +26,32 @@ class CameraExe extends StatefulWidget {
 class _CameraExeState extends State<CameraExe> {
   File? _image;
   final picker = ImagePicker();
-  File? _UploadImage;
-  late int filterNum;
+
+  String? _imageName;
+  Uint8List? _imageBytes;
+  StyleType? _filtertype;
+
+  late CloudApi api;
+
+  @override
+  void initState(){
+    super.initState();
+    rootBundle.loadString('assets/credentials.json').then((json) {
+      api = CloudApi(json);
+    });
+  }
+
+  void uploadImage(String bucketName) async {
+    final response = await api.save(_imageName!, _imageBytes!, bucketName);
+    print(response.downloadLink);
+
+    //String? token = await TokenManager.loadToken();
+    String token="test";
+    if(token != null) {
+      print(token);
+      await api.uploadJSON(token, _filtertype!, response.downloadLink.toString(), "mf-json-data");
+    }
+  }
 
   // 비동기 처리를 통해 카메라와 갤러리에서 이미지를 가져온다.
   Future getImage(ImageSource imageSource) async {
@@ -32,8 +59,9 @@ class _CameraExeState extends State<CameraExe> {
 
     setState(() {
       _image = File(image!.path); // 가져온 이미지를 _image에 저장
+      _imageBytes = _image!.readAsBytesSync();
+      _imageName = _image!.path.split('/').last;
     });
-
   }
 
   void changeImage(String imgPath) async{
@@ -60,56 +88,44 @@ class _CameraExeState extends State<CameraExe> {
   }
 
 
-  // 스토리지에 이미지 업로드
-  Future<String> uploadImage(File imageFile) async {
-    FirebaseStorage storage = FirebaseStorage.instance;   // 파이어베이스 스토리지 인스턴스 가져옴
-    Reference ref = storage.ref().child('mf-content-images');  // 업로드할 이미지 경로 저장
-
-    UploadTask uploadTask = ref.putFile(imageFile); //파일 업로드. 비동기로 작동
-    TaskSnapshot storageTaskSnapshot = await uploadTask;  // 업로드 될때까지 대기, 완료되면 업로드된 파일 정보를 포함하는 TaskSnapshot을 가져옴
-    String downloadURL = await storageTaskSnapshot.ref.getDownloadURL();  //업로드된 파일의 다운로드 URL
-    return downloadURL;
-  }
-
-
-
-
-
   ///////////// 필터 칸 ///////////////////////////////////////////
-  final List<Image> filters = <Image>[
-    Image.asset("assets/monk.jpg", fit: BoxFit.fill,),
-    Image.asset("assets/splash.png", fit: BoxFit.fill,),
-    Image.asset("assets/tmp2.png", fit: BoxFit.fill,),
-    Image.asset("assets/tmp4.png", fit: BoxFit.fill,),
-    Image.asset("assets/tmp1.png", fit: BoxFit.fill,),
-    Image.asset("assets/splash.png", fit: BoxFit.fill,),
-    Image.asset("assets/tmp3.png", fit: BoxFit.fill,),
-    Image.asset("assets/tmp4.png", fit: BoxFit.fill,)];
+
+  final Map<StyleType, Image> filtersMap = {
+    StyleType.the_scream: Image.asset("assets/monk.jpg", fit: BoxFit.fill),
+    StyleType.rain_princess: Image.asset("assets/splash.png", fit: BoxFit.fill),
+    StyleType.la_muse: Image.asset("assets/tmp2.png", fit: BoxFit.fill),
+    StyleType.the_shipwreck_of_the_minotaur: Image.asset("assets/tmp4.png", fit: BoxFit.fill),
+    StyleType.udnie: Image.asset("assets/tmp1.png", fit: BoxFit.fill),
+    StyleType.wave: Image.asset("assets/wave.jpg", fit: BoxFit.fill),
+  };
 
   Widget listview_builder(){
     return ListView.builder(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.all(2),
-      itemCount: filters.length,
+      itemCount: filtersMap.length,
       itemBuilder: (BuildContext context, int index){
         return InkWell(
             child: ClipRRect(
               borderRadius: BorderRadius.circular(28.0), // 원하는 둥근 정도 설정
               child: Container(
-                child: filters[index],
+                child: filtersMap.values.toList()[index],
                 width: MediaQuery.of(context).size.height * 0.2,
                 padding: EdgeInsets.all(4),
               ),
             ),
             onTap: () => {
-                filterNum = index,
-                print(filterNum),
-             //   changeImage('assets/monkafter.jpg')
+                _filtertype = filtersMap.keys.toList()[index],
+                print("Selected: $_filtertype"),
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Selected: $_filtertype"),),
+                )
             }
         );
       },
     );
   }
+  //////////////////////////////////////////////////////////////////////
 
   @override
   Widget build(BuildContext context) {
@@ -170,7 +186,8 @@ class _CameraExeState extends State<CameraExe> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     // 스토리지에 필터 인덱스와 함께 사진 업로드
-                    uploadImage(_image!);
+                    //uploadImage(_image!);
+                    uploadImage("mf-content-images");
 
                     // 결과창으로 이동
                     Navigator.push(
