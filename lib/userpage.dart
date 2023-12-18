@@ -369,7 +369,6 @@ class _UserPageState extends State<UserPage> {
 
                         }
                       }
-
                   ),
                 )
             ),
@@ -398,15 +397,65 @@ class _UserPageState extends State<UserPage> {
       context: context,
       builder: (BuildContext context) {
         return Dialog(
-          child: InteractiveViewer(
-            boundaryMargin: EdgeInsets.all(20.0),
-            minScale:0.5,
-            maxScale:2.0,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.contain,
-            ),
+          /// 배경 컬러
+          backgroundColor: Colors.grey.shade100,
+          /// 그림자 컬러
+          shadowColor: Colors.white,
+
+          /// 다이얼로그의 모양 설정
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
+          /// z축 높이, elevation의 값이 높을 수록 그림자가 아래 위치하게 됩니다.
+          elevation: 10,
+
+          child: Container(
+            child: Column(
+              children: <Widget>[
+                Row(
+                  children: [
+                    Text(
+                        "title",
+                      style: TextStyle(
+                        fontSize: 10.0,
+
+                      ),
+                    ),
+                    SizedBox(width:5.0),
+                    Text("2023-12-31",
+                    style: TextStyle(
+                      fontSize: 6.0,
+                    ),),
+                  ],
+                ),
+                InteractiveViewer(
+                  boundaryMargin: EdgeInsets.all(20.0),
+                  minScale:0.5,
+                  maxScale:2.0,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                  ),
+
+                ),
+                Text(
+                    "ㄴr는 ㄱr끔 눈물.을 흘린ㄷr...",
+                style: TextStyle(
+                  fontSize: 8.0,
+                ),),
+              ],
+
+            )
+          )
+          // child: InteractiveViewer(
+          //   boundaryMargin: EdgeInsets.all(20.0),
+          //   minScale:0.5,
+          //   maxScale:2.0,
+          //   child: Image.network(
+          //     imageUrl,
+          //     fit: BoxFit.contain,
+          //   ),
+          // ),
         );
       },
     );
