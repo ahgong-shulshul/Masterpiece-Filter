@@ -45,8 +45,8 @@ class _CameraExeState extends State<CameraExe> {
     final response = await api.save(_imageName!, _imageBytes!, bucketName);
     print(response.downloadLink);
 
-    //String? token = await TokenManager.loadToken();
-    String token="test";
+    String? token = await TokenManager.loadToken();
+    // String token="test";
     if(token != null) {
       print(token);
       await api.uploadJSON(token, _filtertype!, response.downloadLink.toString(), "mf-json-data");

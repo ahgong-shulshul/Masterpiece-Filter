@@ -38,7 +38,7 @@ class _VisitedPageState extends State<VisitedPage> {
   // 받아와야할 것: 사용자 배경사진, 프로필사진, 이름, 게시물 수, 게시물 사진들
   Future<UserPageData> ReceiveUserData() async {
     int idInApi = widget.id;
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/<int:user_id>/detail/';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/$idInApi/detail';
 
     String? token = await TokenManager.loadToken();
 
@@ -53,16 +53,16 @@ class _VisitedPageState extends State<VisitedPage> {
 
       if (response.statusCode == 200) {
         print('데이터 통신 성공');
-        //print(response.body);
+        print(response.body);
 
         // JSON 문자열을 파싱
-        final List<dynamic> responseData = jsonDecode(response.body);
-        //print(responseData);
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
 
         if(responseData.isNotEmpty){
-          final Map<String, dynamic> userDataMap = responseData.first;
-          print(userDataMap);
-          return UserPageData.fromJson(userDataMap);
+          //final Map<String, dynamic> userDataMap = responseData.first;
+          //print(userDataMap);
+          return UserPageData.fromJson(responseData);
         }
         else{
           throw Exception('Empty response data');
@@ -84,7 +84,7 @@ class _VisitedPageState extends State<VisitedPage> {
   Future<List<UserPagePosts>> ReceiveUserPosts() async {
     int idInApi = widget.id;
 
-    final String apiUrl = 'http://10.0.2.2:8000/feed/$idInApi/post/';
+    final String apiUrl = 'http://10.0.2.2:8000/feed/$idInApi/post';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
@@ -97,7 +97,7 @@ class _VisitedPageState extends State<VisitedPage> {
       );
 
       if (response.statusCode == 200) {
-        print('데이터 통신 성공');
+        print('데이터 통신 성공!');
         print(response.body);
 
         // JSON 문자열을 파싱
