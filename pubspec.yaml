@@ -50,6 +50,7 @@ dependencies:
   googleapis: ^11.4.0
   googleapis_auth: ^1.4.1
   gcloud: ^0.8.11
+  firebase_core: ^2.24.2
 
 
 dev_dependencies:

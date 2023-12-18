@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/camera.dart';
 import 'package:into_the_masterpiece/enumdata.dart';
 import 'package:into_the_masterpiece/search_follower.dart';
+import 'package:into_the_masterpiece/token_manager.dart';
+import 'package:into_the_masterpiece/userpage_data.dart';
 
 
 class UserPage extends StatefulWidget {
@@ -17,7 +20,86 @@ class UserPage extends StatefulWidget {
 }
 
 class _UserPageState extends State<UserPage> {
+
+  UserPageData? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadUserData();
+  }
+
+  Future<void> _loadUserData() async {
+    try {
+      userData = await ReceiveUserData();
+      setState(() {}); // 상태를 갱신하여 위젯을 다시 그림
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
+  }
   // 받아와야할 것: 사용자 배경사진, 프로필사진, 이름, 게시물 수, 게시물 사진들
+  Future<UserPageData> ReceiveUserData() async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/social-login/';
+    String? token = await TokenManager.loadToken();
+
+    if(token != null){
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+      );
+
+      if (response.statusCode == 200) {
+        print('데이터 통신 성공');
+        final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+        return UserPageData.fromJson(responseData);
+      }
+      else {
+        print('데이터 얻기 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
+      }
+    }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
+
+  Future<void> SendChangedUserData() async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/social-login/';
+    String? token = await TokenManager.loadToken();
+
+    if(token != null){
+      final response = await http.post(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body:jsonEncode({
+          'back_ground': _BGImage?.path,
+          'profile': _ProfileImage?.path,
+        })
+      );
+
+      if (response.statusCode == 200) {
+        print('데이터 전송 성공');
+      }
+      else {
+        print('데이터 전송 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
+      }
+    }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
 
   File? _BGImage;
   File? _ProfileImage;
@@ -49,17 +131,17 @@ class _UserPageState extends State<UserPage> {
             top: 0,
             child: _BGImage == null
               ?Image.network(
-              'https://blog.kakaocdn.net/dn/bnbTHu/btr5PSP5iSM/iktsvSfeUxKXZ2le4XlKL1/img.png',
+              'https://photo.coolenjoy.co.kr/data/editor/1812/20181204171053_e6c3ceb981729bb7540012c70b72d769_t2n3.jpg',
               width: MediaQuery.of(context).size.width,
               height: MediaQuery.of(context).size.height / 4,
               fit: BoxFit.cover,
               )
              :Image.file(
-                File(_BGImage!.path),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 4,
-                fit: BoxFit.cover,
-              )
+              File(userData!.background_picture!),
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height / 4,
+              fit: BoxFit.cover,
+             )
           ),
 
           // 검색버튼
@@ -92,17 +174,19 @@ class _UserPageState extends State<UserPage> {
             ),
           ),
 
-          // 배경 사진 설정 버튼
+          // 설정 버튼
           Positioned(
             top: 30.0,
             right: 20.0,
             child: PopupMenuButton<SettingMenu>(
               onSelected: (SettingMenu res){
-                if(res == SettingMenu.changeBGImg){
+                if(res == SettingMenu.changeBGImg){   // 배경 사진 변경
                   getBGImage(ImageSource.gallery);
+                  SendChangedUserData();
                 }
-                else if(res == SettingMenu.changProfileImg){
+                else if(res == SettingMenu.changProfileImg){    // 프로필 사진 변경
                   getProfileImage(ImageSource.gallery);
+                  SendChangedUserData();
                 }
                 else{
                   Navigator.push(
@@ -145,35 +229,34 @@ class _UserPageState extends State<UserPage> {
             left: 30.0, // 배경 이미지 좌측에서의 위치
             child: Row(
               children: [
-              // 프로필 이미지
-              Container(
-                width: 100.0,
-                height: 100.0,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                  color: Colors.black, // 검은색 테두리
-                  width: 3.0, // 테두리 두께
+                // 프로필 이미지
+                Container(
+                  width: 100.0,
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                    color: Colors.black, // 검은색 테두리
+                    width: 3.0, // 테두리 두께
+                    ),
                   ),
-                ),
 
-              child: ClipOval(
-              child: _ProfileImage == null
-                ?Image.network(
-                'https://tumblbug-pci.imgix.net/873c897e881d022a0232b64dd3185ef30900d695/7cfb3abbd6858246bf2035597db71d580c2d498a/c65bafbe8e9498d7c5e0d1df698eb3bd734170da/2bfdcf8a-9171-4ff8-8c42-0cb0fd0f9faf.jpeg?ixlib=rb-1.1.0&w=1240&h=930&auto=format%2Ccompress&lossless=true&fit=crop&s=e880d7909a5ff6649147526c7eae0ecc',
-                fit: BoxFit.cover,
-                )
-                  :Image.file(
-                File(_ProfileImage!.path),
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height / 4,
-                fit: BoxFit.cover,
-              )
-              ),
-              ),
+                  child: ClipOval(
+                  child: _ProfileImage == null
+                    ?Image.network(
+                    'https://i.pinimg.com/236x/39/a1/eb/39a1eb1485516800d84981a72840d60e.jpg',
+                    fit: BoxFit.cover,
+                    )
+                    :Image.file(
+                      File(userData!.profile_picture!),
+                      fit: BoxFit.cover,
+                    )
+                    )
+                ),
               ],
             ),
           ),
+
 
           Positioned(
             top: MediaQuery.of(context).size.height / 4 + 20, // 배경 이미지 하단에서의 위치
@@ -183,7 +266,7 @@ class _UserPageState extends State<UserPage> {
                 // 유저 닉네임
                 SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
-                  '1004jumto',
+                  userData!.username!,
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.black,
@@ -193,7 +276,7 @@ class _UserPageState extends State<UserPage> {
                 // 포스팅 개수
                 SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
-                  '20posts',
+                  userData!.postSum!.toString(),
                   style: TextStyle(
                     fontSize: 20.0,
                     color: Colors.black,
@@ -215,25 +298,25 @@ class _UserPageState extends State<UserPage> {
               child: GridView.builder(
                 gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 3, // 열의 수
-                  crossAxisSpacing: 8.0, // 열 간격
-                  mainAxisSpacing: 8.0, // 행 간격
+                  crossAxisSpacing: 5.0, // 열 간격
+                  mainAxisSpacing: 5.0, // 행 간격
                 ),
-                  itemCount: 20, // 그리드 아이템의 총 개수
+                  itemCount: userData!.postSum, // 그리드 아이템의 총 개수
                   itemBuilder: (context, index) {
+                    String imageUrl = userData!.postUrls[index];
                     return GestureDetector(
                       onTap: () {
-                        _showImageDialog(
-                            'https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/Pl7/image/xjgTErkwnIxLxEWStE_f9UEUHVs.jpg');
-                      },
-                      child: _buildPhoto(
-                          'https://img1.daumcdn.net/thumb/R1280x0/?fname=http://t1.daumcdn.net/brunch/service/user/Pl7/image/xjgTErkwnIxLxEWStE_f9UEUHVs.jpg'),
+                        _showImageDialog(imageUrl);
+                    },
+
+                      child: _buildPhoto(imageUrl)
                     );
-                  }
+                }
               ),
             )
           ),
         ],
-      ),
+      )
     );
   }
 

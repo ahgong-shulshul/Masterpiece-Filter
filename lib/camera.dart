@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -58,70 +59,21 @@ class _CameraExeState extends State<CameraExe> {
                 : Image.file(File(_image!.path))));
   }
 
-  GoogleSignIn _googleSignIn = GoogleSignIn(scopes: ['https://www.googleapis.com/auth/cloud-platform']);
-  GoogleSignInAccount? _currentUser;
-  String _bucketName = 'mf-content-images'; // GCS 버킷 이름
 
+  // 스토리지에 이미지 업로드
+  Future<String> uploadImage(File imageFile) async {
+    FirebaseStorage storage = FirebaseStorage.instance;   // 파이어베이스 스토리지 인스턴스 가져옴
+    Reference ref = storage.ref().child('mf-content-images');  // 업로드할 이미지 경로 저장
 
-
-  @override
-  void initState() {
-    super.initState();
-    _googleSignIn.onCurrentUserChanged.listen((GoogleSignInAccount? account) {
-      setState(() {
-        _currentUser = account;
-      });
-    });
-    _googleSignIn.signInSilently();
+    UploadTask uploadTask = ref.putFile(imageFile); //파일 업로드. 비동기로 작동
+    TaskSnapshot storageTaskSnapshot = await uploadTask;  // 업로드 될때까지 대기, 완료되면 업로드된 파일 정보를 포함하는 TaskSnapshot을 가져옴
+    String downloadURL = await storageTaskSnapshot.ref.getDownloadURL();  //업로드된 파일의 다운로드 URL
+    return downloadURL;
   }
 
-  Future<void> _uploadImage(String imagePath, int filter) async {
-    if (_currentUser == null) {
-      await _handleSignIn();
-    }
 
-    if (_currentUser != null) {
-      String accessToken = await _currentUser!.authentication.then((value) => value.accessToken ?? '');
-      String apiUrl = 'https://storage.googleapis.com/upload/storage/v1/b/$_bucketName/o?uploadType=media&name=my-image.jpg';
 
-      File imageFile = File(imagePath);
-      List<int> imageBytes = await imageFile.readAsBytes();
 
-      http.Response response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Authorization': 'Bearer $accessToken',
-          'Content-Type': 'image/jpeg',
-        },
-        body: imageBytes,
-      );
-
-      if (response.statusCode == 200) {
-        print('Image uploaded successfully!');
-      } else {
-        print('Image upload failed. Status code: ${response.statusCode}');
-      }
-    }
-  }
-
-  Future<void> _handleSignIn() async {
-    try {
-      await _googleSignIn.signIn();
-    } catch (error) {
-      print(error);
-    }
-  }
-
-  Future<void> _handleSignOut() async {
-    try {
-      await _googleSignIn.signOut();
-      setState(() {
-        _currentUser = null;
-      });
-    } catch (error) {
-      print(error);
-    }
-  }
 
   ///////////// 필터 칸 ///////////////////////////////////////////
   final List<Image> filters = <Image>[
@@ -218,7 +170,7 @@ class _CameraExeState extends State<CameraExe> {
                   icon: Icon(Icons.check),
                   onPressed: () {
                     // 스토리지에 필터 인덱스와 함께 사진 업로드
-                    _uploadImage(_image!.path, filterNum);
+                    uploadImage(_image!);
 
                     // 결과창으로 이동
                     Navigator.push(

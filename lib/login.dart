@@ -54,7 +54,7 @@ class _LoginExeState extends State<LoginExe> {
   }
 
   Future<void> sendEmailAndReceiveToken(String email) async {
-    final String apiUrl = 'http://127.0.0.1:8000/feed/14';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/social-login/';
 
     final response = await http.post(
       Uri.parse(apiUrl),
