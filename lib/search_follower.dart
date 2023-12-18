@@ -1,14 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_naver_login/flutter_naver_login.dart';
 import 'package:http/http.dart' as http;
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/tempUserpage.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:into_the_masterpiece/userpage.dart';
-import 'enumdata.dart';
+import 'miniProfile.dart';
 
 class SearchExe extends StatefulWidget{
   const SearchExe({Key? key}) :super(key: key);
@@ -18,6 +16,7 @@ class SearchExe extends StatefulWidget{
 }
 
 class _SearchExeState extends State<SearchExe> {
+  // 검색 기능
   TextEditingController _filter = TextEditingController();
   FocusNode focusNode = FocusNode();
   String _searchText="";
@@ -30,67 +29,72 @@ class _SearchExeState extends State<SearchExe> {
     });
   }
 
-  List<String> tempUserList = [
-    "min02choi", "sooking87", "ye.ann926", "leeyjin", "yejio_oi", "hyn.zzi", "um_im_ss",
-    "shynewshy", "to.kk.ii", "desert_f0g", "didiwr", "zimini55", "victory_hee", "moonchloe12",
-    "pea.a.a", "pretty077", "yenio_oi", "viviroiott", "kylie2192", "rlalstjd", "dldpwls01",
-  ];
+  // 유저들 데이터 : 유저 아이디, 유저 프로필사진
+  List<ShortProfile>? users;
 
-  List<String> tempImgPathList = [
-    "assets/tmp1.png","assets/tmp2.png","assets/tmp3.png","assets/tmp4.png","assets/tmp5.png",
-    "assets/tmp1.png","assets/tmp2.png","assets/tmp3.png","assets/tmp4.png","assets/tmp5.png",
-    "assets/tmp1.png","assets/tmp2.png","assets/tmp3.png","assets/tmp4.png","assets/tmp5.png",
-    "assets/tmp1.png","assets/tmp2.png","assets/tmp3.png","assets/tmp4.png","assets/tmp5.png",
-    "assets/tmp1.png",
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _loadUsersShortProfiles();
+  }
 
-  // Future<List<UserPagePosts>> ReceiveUserPosts() async {
-  //   final String apiUrl = 'http://10.0.2.2:8000/feed/';
-  //   String? token = await TokenManager.loadToken();
-  //
-  //   if(token != null){
-  //     final response = await http.get(
-  //       Uri.parse(apiUrl),
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //         'Authorization': 'Token $token',
-  //       },
-  //     );
-  //
-  //     if (response.statusCode == 200) {
-  //       print('데이터 통신 성공');
-  //       print(response.body);
-  //
-  //       // JSON 문자열을 파싱
-  //       final List<dynamic> responseData = jsonDecode(response.body);
-  //       print(responseData);
-  //
-  //       // 파싱된 데이터를 PostData 모델 객체의 리스트로 변환
-  //       List<UserPagePosts> userPosts = responseData.map((json) => UserPagePosts.fromJson(json)).toList();
-  //
-  //       return userPosts;
-  //     }
-  //     else {
-  //       print('데이터 얻기 실패');
-  //       print('HTTP Status Code: ${response.statusCode}');
-  //       throw Exception('Failed to fetch user data');
-  //     }
-  //   }
-  //   else {
-  //     print('토큰이 null입니다.');
-  //     throw Exception('Token is null');
-  //   }
-  // }
+  Future<void> _loadUsersShortProfiles() async {
+    try {
+      users = await ReceiveUsersShortProfiles();
+      print(users);
+      setState(() {}); // 상태를 갱신하여 위젯을 다시 그림
+    } catch (e) {
+      print('Error loading user data: $e');
+    }
+  }
 
-  Widget _buildList(BuildContext context, List<String> list) {
-    List<String> searchResults = [];
+  Future<List<ShortProfile>> ReceiveUsersShortProfiles() async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/list/';
+    String? token = await TokenManager.loadToken();
 
-    for (String d in list) {
-      if (d.contains(_searchText)) {
-        searchResults.add(d);
+    if(token != null){
+      final response = await http.get(
+        Uri.parse(apiUrl),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+      if (response.statusCode == 200) {
+        print('데이터 통신 성공');
+        print(response.body);
+
+        // JSON 문자열을 파싱
+        final List<dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
+
+        // 파싱된 데이터를 PostData 모델 객체의 리스트로 변환
+        List<ShortProfile> datas = responseData.map((json) => ShortProfile.fromJson(json)).toList();
+
+        return datas;
+      }
+      else {
+        print('데이터 얻기 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
       }
     }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
 
+  Widget _buildList(BuildContext context) {
+    List<String> searchResults = [];
+
+    if(users != null){
+      for (ShortProfile p in users!) {
+        if (p.username.contains(_searchText)) {
+          searchResults.add(p.username);
+        }
+      }
+    }
     return Expanded(
       child: GridView.count(
           crossAxisCount: 3,
@@ -103,12 +107,19 @@ class _SearchExeState extends State<SearchExe> {
   }
 
   Widget _buildListItem(BuildContext context, String data) {
+    ShortProfile? userProfile;
+
+    if (users != null) {
+      // 사용자 이름이 일치하는 ShortProfile 객체 찾기
+      userProfile = users!.firstWhere((profile) => profile.username == data);
+    }
+
     return InkWell(
         child: Column(
             children: [
               ClipOval(
-                child: Image.asset(
-                  tempImgPathList[tempUserList.indexOf(data)],
+                child: Image.network(
+                  userProfile?.profile_picture ?? '',
                   width: 80.0, // 이미지의 크기를 조절할 수 있습니다.
                   height: 80.0,
                   fit: BoxFit.cover,
@@ -248,29 +259,11 @@ class _SearchExeState extends State<SearchExe> {
                 ],
               ),
             ),
-            _buildList(context, tempUserList),
+            _buildList(context),
           ],
         )
       )
-      // Column(
-      //   children: [
-      //     TextField(
-      //       controller: _searchController,
-      //       decoration: InputDecoration(
-      //         border: InputBorder.none,
-      //         icon: Padding(
-      //           padding: EdgeInsets.only(left: 30),
-      //           child: Icon(Icons.search)
-      //         )
-      //       ),
-      //       onChanged: (value) {
-      //         // 검색어가 변경될 때 처리
-      //         print('검색어: $value');
-      //         // 여기서 검색 결과 업데이트 또는 필요한 동작 수행
-      //       },
-      //     ),
-      //   ]
-      // ),
+       
     );
   }
 
