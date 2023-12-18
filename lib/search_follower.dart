@@ -3,7 +3,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:into_the_masterpiece/Home.dart';
-import 'package:into_the_masterpiece/tempUserpage.dart';
+import 'package:into_the_masterpiece/VisitedPage.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:into_the_masterpiece/userpage.dart';
 import 'miniProfile.dart';
@@ -133,7 +133,7 @@ class _SearchExeState extends State<SearchExe> {
         ),
           onTap: () {
             Navigator.push(
-                context, MaterialPageRoute(builder: (_) => TempUserPage()));
+                context, MaterialPageRoute(builder: (context) => VisitedPage(id: userProfile!.id)));
                 }
     );
     //   TextButton(
@@ -263,7 +263,7 @@ class _SearchExeState extends State<SearchExe> {
           ],
         )
       )
-       
+
     );
   }
 

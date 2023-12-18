@@ -4,7 +4,7 @@ class UserPageData {
   final int id;
   final String username;
   final String email;
-  final String dataJoined;
+  final String dateJoined;
   final String background_picture;
   final String profile_picture;
   final int postSum;
@@ -14,7 +14,7 @@ class UserPageData {
     required this.id,
     required this.username,
     required this.email,
-    required this.dataJoined,
+    required this.dateJoined,
     required this.profile_picture,
     required this.background_picture,
     required this.postSum,
@@ -29,7 +29,7 @@ class UserPageData {
       id: json['id'],
       username: json['username'],
       email: json['email'],
-      dataJoined: json['date_joined'],
+      dateJoined: json['date_joined'],
       profile_picture: json['profile_pic'],
       background_picture: json['background_pic'],
       postSum: json['total_posts'],
@@ -39,8 +39,6 @@ class UserPageData {
 }
 
 class UserPagePosts {
-  List<String> postUrls=[];
-
   final int postid;
   final String title;
   final String desc;
