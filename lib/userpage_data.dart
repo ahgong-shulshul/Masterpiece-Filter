@@ -1,52 +1,70 @@
 // 받아와야할 것: 사용자 배경사진, 프로필사진, 이름, 게시물 수, 게시물 사진들
 
-import 'dart:html';
-
 class UserPageData {
-  String? username;
-  String? background_picture;
-  String? profile_picture;
-  int postSum;
+  final int id;
+  final String username;
+  final String email;
+  final String dataJoined;
+  final String background_picture;
+  final String profile_picture;
+  final int postSum;
   //final List<String> postUrls;
 
   UserPageData({    // 생성자
+    required this.id,
     required this.username,
-    required this.background_picture,
+    required this.email,
+    required this.dataJoined,
     required this.profile_picture,
+    required this.background_picture,
     required this.postSum,
     //required this.postUrls
   });
-/*
-  Map<String, dynamic> toJson() => {
-    'username': username,
-    'back_ground': background_picture,
-    'profile': profile_picture,
-    'postSum': postSum,
-    'postUrls': postUrls,
-  };
-*/
+
   factory UserPageData.fromJson(Map<String, dynamic> json) {
+    // print(json['username']);
+    // print(json['profile_pic']);
+    // print(json['total_posts']);
     return UserPageData(
+      id: json['id'],
       username: json['username'],
+      email: json['email'],
+      dataJoined: json['date_joined'],
       profile_picture: json['profile_pic'],
       background_picture: json['background_pic'],
       postSum: json['total_posts'],
-     // postUrls: List<String>.from(json['postUrls'])
+      // postUrls: List<String>.from(json['postUrls'])
     );
   }
 }
 
 class UserPagePosts {
-  final List<String> postUrls;
+  List<String> postUrls=[];
+
+  final int postid;
+  final String title;
+  final String desc;
+  final String postUrl;
+  final String postDate;
+  final int id;
 
   UserPagePosts({    // 생성자
-
-    required this.postUrls
+    required this.postid,
+    required this.title,
+    required this.desc,
+    required this.postUrl,
+    required this.postDate,
+    required this.id,
   });
 
   factory UserPagePosts.fromJson(Map<String, dynamic> json) {
     return UserPagePosts(
-         postUrls: List<String>.from(json['postUrls'])
+      postid: json['post_id'],
+      title: json['post_title'],
+      desc: json['post_des'],
+      postUrl: json['post_image'],
+      postDate: json['post_date'],
+      id: json['user_id'],
     );
   }
 }

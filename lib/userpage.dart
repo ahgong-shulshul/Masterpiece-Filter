@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:ffi';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
@@ -21,7 +20,7 @@ class UserPage extends StatefulWidget {
 
 class _UserPageState extends State<UserPage> {
   UserPageData? userData;
-  UserPagePosts? userPosts;
+  List<UserPagePosts>? userPosts;
 
   @override
   void initState() {
@@ -33,6 +32,7 @@ class _UserPageState extends State<UserPage> {
     try {
       userData = await ReceiveUserData();
       userPosts = await ReceiveUserPosts();
+      print(userData);
       setState(() {}); // 상태를 갱신하여 위젯을 다시 그림
     } catch (e) {
       print('Error loading user data: $e');
@@ -54,9 +54,21 @@ class _UserPageState extends State<UserPage> {
 
       if (response.statusCode == 200) {
         print('데이터 통신 성공');
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        //print(response.body);
 
-        return UserPageData.fromJson(responseData);
+        // JSON 문자열을 파싱
+        final List<dynamic> responseData = jsonDecode(response.body);
+        //print(responseData);
+
+        if(responseData.isNotEmpty){
+          final Map<String, dynamic> userDataMap = responseData.first;
+          print(userDataMap);
+          return UserPageData.fromJson(userDataMap);
+        }
+        else{
+          throw Exception('Empty response data');
+        }
+
       }
       else {
         print('데이터 얻기 실패');
@@ -70,8 +82,8 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  Future<UserPagePosts> ReceiveUserPosts() async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
+  Future<List<UserPagePosts>> ReceiveUserPosts() async {
+    final String apiUrl = 'http://10.0.2.2:8000/feed/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
@@ -85,9 +97,16 @@ class _UserPageState extends State<UserPage> {
 
       if (response.statusCode == 200) {
         print('데이터 통신 성공');
-        final Map<String, dynamic> responseData = jsonDecode(response.body);
+        print(response.body);
 
-        return UserPagePosts.fromJson(responseData);
+        // JSON 문자열을 파싱
+        final List<dynamic> responseData = jsonDecode(response.body);
+        print(responseData);
+
+        // 파싱된 데이터를 PostData 모델 객체의 리스트로 변환
+        List<UserPagePosts> userPosts = responseData.map((json) => UserPagePosts.fromJson(json)).toList();
+
+        return userPosts;
       }
       else {
         print('데이터 얻기 실패');
@@ -107,15 +126,15 @@ class _UserPageState extends State<UserPage> {
 
     if(token != null){
       final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body:jsonEncode({
-          'back_ground': _BGImage?.path,
-          'profile': _ProfileImage?.path,
-        })
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body:jsonEncode({
+            'back_ground': _BGImage?.path,
+            'profile': _ProfileImage?.path,
+          })
       );
 
       if (response.statusCode == 200) {
@@ -156,199 +175,206 @@ class _UserPageState extends State<UserPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          // 배경 사진
-          Positioned(
-            top: 0,
-            child: _BGImage == null
-              ?Image.network(
-              'https://photo.coolenjoy.co.kr/data/editor/1812/20181204171053_e6c3ceb981729bb7540012c70b72d769_t2n3.jpg',
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 4,
-              fit: BoxFit.cover,
-              )
-             :Image.file(
-              File(userData!.background_picture!),
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height / 4,
-              fit: BoxFit.cover,
-             )
-          ),
-
-          // 검색버튼
-          Positioned(
-            top: 30.0,
-            right: 50.0,
-            child: IconButton(
-              icon: Icon(Icons.search),
-              onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SearchExe())
-                );
-              },
+        body: Stack(
+          children: [
+            // 배경 사진
+            Positioned(
+                top: 0,
+                child: userData == null
+                    ?Image.network(
+                  'https://photo.coolenjoy.co.kr/data/editor/1812/20181204171053_e6c3ceb981729bb7540012c70b72d769_t2n3.jpg',
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 4,
+                  fit: BoxFit.cover,
+                )
+                    :Image.network(
+                  userData!.background_picture!,
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height / 4,
+                  fit: BoxFit.cover,
+                )
             ),
-          ),
 
-          // 사진 찍기 버튼
-          Positioned(
-            top: 30.0,
-            right: 90.0,
-            child: IconButton(
-              icon: Icon(Icons.camera),
-              onPressed: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => CameraExe()),
-                );
-              },
-            ),
-          ),
-
-          // 설정 버튼
-          Positioned(
-            top: 30.0,
-            right: 20.0,
-            child: PopupMenuButton<SettingMenu>(
-              onSelected: (SettingMenu res){
-                if(res == SettingMenu.changeBGImg){   // 배경 사진 변경
-                  getBGImage(ImageSource.gallery);
-                  SendChangedUserData();
-                }
-                else if(res == SettingMenu.changProfileImg){    // 프로필 사진 변경
-                  getProfileImage(ImageSource.gallery);
-                  SendChangedUserData();
-                }
-                else{
+            // 검색버튼
+            Positioned(
+              top: 30.0,
+              right: 50.0,
+              child: IconButton(
+                icon: Icon(Icons.search),
+                onPressed: () {
                   Navigator.push(
-                      context, MaterialPageRoute(builder: (context) => HomePage()));
-                }
-              },
-              itemBuilder: (BuildContext context){
-                return [
-                  PopupMenuItem(
-                    value: SettingMenu.changeBGImg,
-                    child: Text("배경 변경"),
-                  ),
-                  PopupMenuItem(
-                    value: SettingMenu.changProfileImg,
-                    child: Text("프로필 변경"),
-                  ),
-                  PopupMenuItem(
-                    value: SettingMenu.goHome,
-                    child: Text("홈으로"),
-                  ),
-                ];
-              },
+                      context,
+                      MaterialPageRoute(builder: (context) => SearchExe())
+                  );
+                },
+              ),
             ),
-          ),
 
-          // 흰색 박스
-          Positioned(
-            top: MediaQuery.of(context).size.height / 4, // 배경 이미지 아래에 위치
-            left: 0, // 좌측에 위치
-            right: 0, // 우측에 위치
-            child: Container(
-              height: 60.0, // 박스의 세로 길이
-              color: Colors.white70, // 흰색 배경
+            // 사진 찍기 버튼
+            Positioned(
+              top: 30.0,
+              right: 90.0,
+              child: IconButton(
+                icon: Icon(Icons.camera),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => CameraExe()),
+                  );
+                },
+              ),
             ),
-          ),
 
-          // 프로필 사진
-          Positioned(
-            top: MediaQuery.of(context).size.height / 4 - 50, // 배경 이미지 하단에서의 위치
-            left: 30.0, // 배경 이미지 좌측에서의 위치
-            child: Row(
-              children: [
-                // 프로필 이미지
-                Container(
-                  width: 100.0,
-                  height: 100.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                    color: Colors.black, // 검은색 테두리
-                    width: 3.0, // 테두리 두께
+            // 설정 버튼
+            Positioned(
+              top: 30.0,
+              right: 20.0,
+              child: PopupMenuButton<SettingMenu>(
+                onSelected: (SettingMenu res){
+                  if(res == SettingMenu.changeBGImg){   // 배경 사진 변경
+                    getBGImage(ImageSource.gallery);
+                    SendChangedUserData();
+                  }
+                  else if(res == SettingMenu.changProfileImg){    // 프로필 사진 변경
+                    getProfileImage(ImageSource.gallery);
+                    SendChangedUserData();
+                  }
+                  else{
+                    Navigator.push(
+                        context, MaterialPageRoute(builder: (context) => HomePage()));
+                  }
+                },
+                itemBuilder: (BuildContext context){
+                  return [
+                    PopupMenuItem(
+                      value: SettingMenu.changeBGImg,
+                      child: Text("배경 변경"),
+                    ),
+                    PopupMenuItem(
+                      value: SettingMenu.changProfileImg,
+                      child: Text("프로필 변경"),
+                    ),
+                    PopupMenuItem(
+                      value: SettingMenu.goHome,
+                      child: Text("홈으로"),
+                    ),
+                  ];
+                },
+              ),
+            ),
+
+            // 흰색 박스
+            Positioned(
+              top: MediaQuery.of(context).size.height / 4, // 배경 이미지 아래에 위치
+              left: 0, // 좌측에 위치
+              right: 0, // 우측에 위치
+              child: Container(
+                height: 60.0, // 박스의 세로 길이
+                color: Colors.white70, // 흰색 배경
+              ),
+            ),
+
+            // 프로필 사진
+            Positioned(
+              top: MediaQuery.of(context).size.height / 4 - 50, // 배경 이미지 하단에서의 위치
+              left: 30.0, // 배경 이미지 좌측에서의 위치
+              child: Row(
+                children: [
+                  // 프로필 이미지
+                  Container(
+                      width: 100.0,
+                      height: 100.0,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: Colors.black, // 검은색 테두리
+                          width: 3.0, // 테두리 두께
+                        ),
+                      ),
+
+                      child: ClipOval(
+                          child: userData == null
+                              ?Image.network(
+                            'https://i.pinimg.com/236x/39/a1/eb/39a1eb1485516800d84981a72840d60e.jpg',
+                            fit: BoxFit.cover,
+                          )
+                              :Image.network(
+                            userData!.profile_picture!,
+                            fit: BoxFit.cover,
+                          )
+                      )
+                  ),
+                ],
+              ),
+            ),
+
+
+            Positioned(
+              top: MediaQuery.of(context).size.height / 4 + 20, // 배경 이미지 하단에서의 위치
+              right: 20.0, // 배경 이미지 좌측에서의 위치
+              child: Row(
+                children: [
+                  // 유저 닉네임
+                  SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
+                  Text(
+                    userData != null
+                        ? userData!.username! : "unkown",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.black54,
                     ),
                   ),
 
-                  child: ClipOval(
-                  child: _ProfileImage == null
-                    ?Image.network(
-                    'https://i.pinimg.com/236x/39/a1/eb/39a1eb1485516800d84981a72840d60e.jpg',
-                    fit: BoxFit.cover,
-                    )
-                    :Image.file(
-                      File(userData!.profile_picture!),
-                      fit: BoxFit.cover,
-                    )
-                    )
-                ),
-              ],
-            ),
-          ),
-
-
-          Positioned(
-            top: MediaQuery.of(context).size.height / 4 + 20, // 배경 이미지 하단에서의 위치
-            right: 20.0, // 배경 이미지 좌측에서의 위치
-            child: Row(
-              children: [
-                // 유저 닉네임
-                SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
-                Text(
-                  userData!.username!,
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
+                  // 포스팅 개수
+                  SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
+                  Text(
+                    userData != null ? userData!.postSum!.toString() + " posts" : "Nan",
+                    style: TextStyle(
+                      fontSize: 15.0,
+                      color: Colors.blueAccent,
+                    ),
                   ),
-                ),
-
-                // 포스팅 개수
-                SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
-                Text(
-                  userData!.postSum!.toString(),
-                  style: TextStyle(
-                    fontSize: 20.0,
-                    color: Colors.black,
-                  ),
-                ),
-              ],
-            ),
-          ),
-
-          // 이미지들
-          Positioned(
-            top: MediaQuery.of(context).size.height / 4 + 60,
-            left: 0,
-            right: 0,
-            child: Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height * (3 / 4) - 60,
-
-              child: GridView.builder(
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3, // 열의 수
-                  crossAxisSpacing: 5.0, // 열 간격
-                  mainAxisSpacing: 5.0, // 행 간격
-                ),
-                  itemCount: userData!.postSum, // 그리드 아이템의 총 개수
-                  itemBuilder: (context, index) {
-                    String imageUrl = userPosts!.postUrls[index];
-                    return GestureDetector(
-                      onTap: () {
-                        _showImageDialog(imageUrl);
-                    },
-
-                      child: _buildPhoto(imageUrl)
-                    );
-                }
+                ],
               ),
-            )
-          ),
-        ],
-      )
+            ),
+
+            // 이미지들
+            Positioned(
+                top: MediaQuery.of(context).size.height / 4 + 60,
+                left: 0,
+                right: 0,
+                child: Container(
+                  width: MediaQuery.of(context).size.width,
+                  height: MediaQuery.of(context).size.height * (3 / 4) - 60,
+
+                  child: GridView.builder(
+                      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                        crossAxisCount: 3, // 열의 수
+                        crossAxisSpacing: 5.0, // 열 간격
+                        mainAxisSpacing: 5.0, // 행 간격
+                      ),
+                      itemCount: userData != null ? userData!.postSum : 0, // 그리드 아이템의 총 개수
+                      itemBuilder: (context, index) {
+                        if (userPosts != null) {
+                          String imageUrl = userPosts![index].postUrl;
+                          return GestureDetector(
+                              onTap: () {
+                                _showImageDialog(imageUrl);
+                              },
+
+                              child: _buildPhoto(imageUrl)
+                          );
+                        }
+                        else{
+
+                        }
+                      }
+
+                  ),
+                )
+            ),
+          ],
+        )
     );
   }
 
