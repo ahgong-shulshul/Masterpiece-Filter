@@ -259,8 +259,8 @@ class _UserPageState extends State<UserPage> {
     });
     
     // 이미지를 스토리지에 업로드 -> 다운로드 링크를 받아서 백으로 전달
-    var imgUrl = uploadImage("userimage_storage");
-    SendChangedBG(imgUrl);
+    var imgUrl = await uploadImage("userimage_storage");
+    await SendChangedBG(imgUrl);
   }
   
   
@@ -274,8 +274,8 @@ class _UserPageState extends State<UserPage> {
     });
 
     // 이미지를 스토리지에 업로드 -> 다운로드 링크를 받아서 백으로 전달
-    var imgUrl = uploadImage("userimage_storage");
-    SendChangedProfile(imgUrl);
+    var imgUrl = await uploadImage("userimage_storage");
+    await SendChangedProfile(imgUrl);
   }
 
  
