@@ -6,23 +6,26 @@ import 'package:mime/mime.dart';
 
 import 'enumdata.dart';
 
-
-class CloudApi{
+class CloudApi {
   late final auth.ServiceAccountCredentials _credentials;
   late auth.AutoRefreshingAuthClient _client;
 
-  CloudApi(String json){
+  CloudApi(String json) {
     _credentials = auth.ServiceAccountCredentials.fromJson(json);
   }
 
-  Future<ObjectInfo> save(String name, Uint8List imgBytes, String bucketName) async {
+  Future<ObjectInfo> save(
+      String name, Uint8List imgBytes, String bucketName) async {
     _client = await auth.clientViaServiceAccount(_credentials, Storage.SCOPES);
 
     var storage = Storage(_client, 'Into the masterpiece');
     var bucket = storage.bucket(bucketName);
 
     final type = lookupMimeType(name);
-    return await bucket.writeBytes(name, imgBytes, metadata:ObjectMetadata(contentType: type,) );
+    return await bucket.writeBytes(name, imgBytes,
+        metadata: ObjectMetadata(
+          contentType: type,
+        ));
   }
   /*
   {
@@ -31,7 +34,8 @@ class CloudApi{
   "img_url": "https://storage.cloud.google.com/mf-content-images/user-id-1/hanriver.png"
   }*/
 
-  Future<ObjectInfo> uploadJSON(String token, StyleType styleType, String url, String bucketName) async {
+  Future<ObjectInfo> uploadJSON(
+      String token, StyleType styleType, String url, String bucketName) async {
     _client = await auth.clientViaServiceAccount(_credentials, Storage.SCOPES);
 
     String jsonContent = createJsonString(token, styleType, url);
@@ -44,7 +48,8 @@ class CloudApi{
     Uint8List jsonData = Uint8List.fromList(utf8.encode(jsonContent));
 
     // 파일 업로드
-    return await bucket.writeBytes(token, jsonData, metadata: ObjectMetadata(contentType: 'application/json'));
+    return await bucket.writeBytes(token, jsonData,
+        metadata: ObjectMetadata(contentType: 'application/json'));
   }
 
   String createJsonString(String userId, StyleType styleType, String imgUrl) {
@@ -56,5 +61,4 @@ class CloudApi{
 
     return jsonEncode(jsonData);
   }
-
 }
