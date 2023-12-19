@@ -107,7 +107,7 @@ class _LoginExeState extends State<LoginExe> {
       body: Center(
           child: _loginPlatform != LoginPlatform.none
               ? ForLoggedInUser()
-              : Column(
+              : Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   IconButton(
@@ -116,14 +116,14 @@ class _LoginExeState extends State<LoginExe> {
                       Navigator.pop(context);
                     }
                   ),
-                  SizedBox(height: 30),
+                  SizedBox(width: 30),
 
                   _loginButton(
                     'assets/google.png',
                     signInWithGoogle,
                   ),
 
-                  SizedBox(height: 30),
+                  SizedBox(width: 30),
 
                   _loginButton(
                     'assets/naver.png',
@@ -131,7 +131,7 @@ class _LoginExeState extends State<LoginExe> {
                   ),
 
                   SizedBox(height: 30),
-                  _logoutButton(),
+                 // _logoutButton(),
                 ],
               )),
     );
