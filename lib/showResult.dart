@@ -1,8 +1,11 @@
+import 'dart:convert';
 import 'dart:io';
+import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
+import 'package:into_the_masterpiece/userpage.dart';
 import 'package:path_provider/path_provider.dart';
 
 class ShowResultPage extends StatefulWidget {
@@ -18,6 +21,9 @@ class ShowResultPage extends StatefulWidget {
 class _ShowResultPageState extends State<ShowResultPage> {
    String? userid;
    String? stylizedImageURl;
+
+   TextEditingController titleController = TextEditingController();
+   TextEditingController contentController = TextEditingController();
 
   @override
   void initState() {
@@ -67,6 +73,34 @@ class _ShowResultPageState extends State<ShowResultPage> {
       );
     }
   }
+
+   Future<void> _uploadPost(String title, String desc) async {
+     final String apiUrl = 'http://10.0.2.2:8000/feed/';
+
+     final response = await http.post(
+       Uri.parse(apiUrl),
+       headers: {
+         'Content-Type': 'application/json',
+         'Authorization': 'Token $userid',
+       },
+       body: jsonEncode(
+           {
+              'post_title': title,
+              'post_des' : desc,
+              'post_image': stylizedImageURl,
+           }),
+     );
+
+     if (response.statusCode == 200) {
+       print('게시글 데이터 전송 성공');
+       Navigator.push(
+           context, MaterialPageRoute(builder: (_) => UserPage()));
+     }
+     else {
+       print('게시글 데이터 전송 실패');
+       print('HTTP Status Code: ${response.statusCode}');
+     }
+   }
 
   @override
   Widget build(BuildContext context) {
@@ -166,14 +200,14 @@ class _ShowResultPageState extends State<ShowResultPage> {
                       ),
                     ),
                     onPressed: () {
-                      if(TokenManager.loadToken() == null){
+                      if(userid == null){
                         ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(content: Text("로그인이 필요한 기능입니다!"),)
                         );
                       }
                       // 사진 계정으로 업로드
                       else{
-                        
+                        _showInputPostsDialog();
                       }
 
                     },
@@ -186,5 +220,44 @@ class _ShowResultPageState extends State<ShowResultPage> {
         )
     );
   }
+
+   void _showInputPostsDialog() async {
+     await showDialog(
+       context: context,
+       builder: (BuildContext context) {
+         return AlertDialog(
+           content: Column(
+             children: [
+               TextField(
+                 controller: titleController,
+                 decoration: InputDecoration(hintText: "제목: 10자 이내"),
+               ),
+               TextField(
+                 controller: contentController,
+                 decoration: InputDecoration(hintText: "내용: 10자 이내"),
+               ),
+             ],
+           ),
+
+           actions: [
+             TextButton(
+               onPressed: () {
+                 Navigator.pop(context); // 다이얼로그 닫기
+               },
+               child: Text("취소"),
+             ),
+             TextButton(
+               onPressed: () {
+                 _uploadPost(titleController.text,
+                     contentController.text); // 닉네임 업데이트 메서드 호출
+                 Navigator.pop(context); // 다이얼로그 닫기
+               },
+               child: Text("게시"),
+             ),
+           ],
+         );
+       },
+     );
+   }
 }
 
