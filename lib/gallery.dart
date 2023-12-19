@@ -84,10 +84,10 @@ class _GalleryExeState extends State<GalleryExe> {
 
   ///////////// 필터 칸 ///////////////////////////////////////////
   final Map<StyleType, Image> filtersMap = {
-    StyleType.the_scream: Image.asset("assets/the_scream.jpg", fit: BoxFit.fill),
-    StyleType.rain_princess: Image.asset("assets/rain_princess.jpg", fit: BoxFit.fill),
+    StyleType.scream: Image.asset("assets/the_scream.jpg", fit: BoxFit.fill),
+    StyleType.rain: Image.asset("assets/rain_princess.jpg", fit: BoxFit.fill),
     StyleType.la_muse: Image.asset("assets/la_muse.jpg", fit: BoxFit.fill),
-    StyleType.the_shipwreck_of_the_minotaur: Image.asset("assets/the_shipwreck_of_the_minotaur.jpg", fit: BoxFit.fill),
+    StyleType.wreck: Image.asset("assets/the_shipwreck_of_the_minotaur.jpg", fit: BoxFit.fill),
     StyleType.udnie: Image.asset("assets/udnie.jpg", fit: BoxFit.fill),
     StyleType.wave: Image.asset("assets/wave.jpg", fit: BoxFit.fill),
   };

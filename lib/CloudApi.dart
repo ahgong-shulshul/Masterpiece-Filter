@@ -53,7 +53,7 @@ class CloudApi{
     Map<String, dynamic> jsonData = {
       'user_id': userId,
       'style_type': styleType.toString().split('.').last, // enum을 문자열로 변환
-      'img_url': imgUrl,
+      'img_url': 'https://storage.googleapis.com/mf-content-images/$imgUrl',
     };
 
     return jsonEncode(jsonData);

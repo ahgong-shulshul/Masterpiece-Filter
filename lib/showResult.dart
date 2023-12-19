@@ -32,8 +32,9 @@ class _ShowResultPageState extends State<ShowResultPage> {
   }
 
   Future<void> _initializeData() async {
+    String finalUrl = widget._imageName!.split(".").first;
     userid = await TokenManager.loadToken();
-    stylizedImageURl = "https://storage.googleapis.com/mf-stylized-images/$userid/${widget._imageName}";
+    stylizedImageURl = "https://storage.googleapis.com/mf-stylized-images/$userid/$finalUrl";
 
   }
   // 이미지를 보여주는 위젯
