@@ -80,6 +80,7 @@ class _LoginExeState extends State<LoginExe> {
       case LoginPlatform.google:
         await GoogleSignIn().signOut();
         _loginPlatform = LoginPlatform.none;
+        TokenManager.deleteToken();
         break;
       case LoginPlatform.kakao:
         break;

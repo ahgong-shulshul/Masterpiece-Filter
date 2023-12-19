@@ -136,15 +136,15 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> SendChangedBG(var url) async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
-      final response = await http.post(
+      final response = await http.put(
           Uri.parse(apiUrl),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Token $token',
           },
           body:jsonEncode({
             'username' : userData?.username,
@@ -169,15 +169,15 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> SendChangedProfile(var url) async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
-      final response = await http.post(
+      final response = await http.put(
           Uri.parse(apiUrl),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Token $token',
           },
           body:jsonEncode({
             'username' : userData?.username,
@@ -202,15 +202,15 @@ class _UserPageState extends State<UserPage> {
   }
 
   Future<void> changeUserName(String newName) async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/mypage/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
-      final response = await http.post(
+      final response = await http.put(
           Uri.parse(apiUrl),
           headers: {
             'Content-Type': 'application/json',
-            'Authorization': 'Bearer $token',
+            'Authorization': 'Token $token',
           },
           body:jsonEncode({
             'username' : newName,
@@ -237,11 +237,12 @@ class _UserPageState extends State<UserPage> {
   String? _imageName;
   Uint8List? _imageBytes;
   
-  Future<Uri> uploadImage(String bucketName) async {
+  Future<String> uploadImage(String bucketName) async {
     final response = await api.save(_imageName!, _imageBytes!, bucketName);
+    String url = 'https://storage.googleapis.com/$bucketName/$_imageName}';
     print(response.downloadLink);
-
-    return response.downloadLink;
+    print("백에 전송한 이미지 url: $url");
+    return url;
   }
   
   // 비동기 처리를 통해 카메라와 갤러리에서 이미지를 가져온다.
@@ -472,6 +473,9 @@ class _UserPageState extends State<UserPage> {
 
                               child: _buildPhoto(imageUrl)
                           );
+                        }
+                        else{
+                          return Container();
                         }
 
                       }
