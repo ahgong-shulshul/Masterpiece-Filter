@@ -29,6 +29,8 @@ class _CameraExeState extends State<CameraExe> {
 
   late CloudApi api;
 
+  String? token;
+
   @override
   void initState(){
     super.initState();
@@ -41,11 +43,11 @@ class _CameraExeState extends State<CameraExe> {
     final response = await api.save(_imageName!, _imageBytes!, bucketName);
     print(response.downloadLink);
 
-    String? token = await TokenManager.loadToken();
+    token = await TokenManager.loadToken();
     // String token="test";
     if(token != null) {
       print(token);
-      await api.uploadJSON(token, _filtertype!, response.downloadLink.toString(), "mf-json-data");
+      await api.uploadJSON(token!, _filtertype!, response.downloadLink.toString(), "mf-json-data");
     }
   }
 
@@ -162,7 +164,7 @@ class _CameraExeState extends State<CameraExe> {
                   icon: Icon(Icons.person),
                   onPressed: () {
                     // 사용자 계정으로 이동(로그인 유무 생각)
-                    if(TokenManager.loadToken() != null){
+                    if(token != null){
                       Navigator.push(
                         context, MaterialPageRoute(builder: (context) => UserPage()),
                       );

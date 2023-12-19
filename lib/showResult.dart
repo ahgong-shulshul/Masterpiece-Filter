@@ -16,8 +16,8 @@ class ShowResultPage extends StatefulWidget {
 }
 
 class _ShowResultPageState extends State<ShowResultPage> {
-  late String userid;
-  late String stylizedImageURl;
+   String? userid;
+   String? stylizedImageURl;
 
   @override
   void initState() {
@@ -26,7 +26,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
   }
 
   Future<void> _initializeData() async {
-    userid = await TokenManager.loadToken() ?? '';
+    userid = await TokenManager.loadToken();
     stylizedImageURl = "https://storage.googleapis.com/mf-stylized-images/$userid/${widget._imageName}";
     setState(() {});
   }
@@ -39,10 +39,10 @@ class _ShowResultPageState extends State<ShowResultPage> {
         width: MediaQuery.of(context).size.width * 0.96,
         height: MediaQuery.of(context).size.height * 0.7,
         child: Center(
-            child: widget._image == null
+            child: stylizedImageURl == null
                 ? Text('Take Image')
                 : Image.network(
-              stylizedImageURl,
+              stylizedImageURl!,
             )
         ));
   }
