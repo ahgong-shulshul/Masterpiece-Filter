@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework import status
 
 from .models import CustomUser
-from .serializers import CustomUserSerializer
+from .serializers import CustomUserSerializer, CustomUserSerializerSearch
 
 
 # URL: customuser/social-login
@@ -20,24 +20,42 @@ class SocialLoginAPIView(APIView):
             user_data = json.loads(request.body.decode('utf-8'))
             # 사용자를 생성/가져오기(기존에 있는 사용자의 경우 created에 False 할당)
             # user은 사용자 객체
-            user, created = CustomUser.objects.get_or_create(username=user_data['email'])
+            user, created = CustomUser.objects.get_or_create(email=user_data['email'])
             test_pw = ""
+            cur_username = ""
+
+            print("created?: ", created)
             if created:
                 print(CustomUser.username)
                 user.set_password("test")
                 # test_pw = user.set_unusable_password()
                 user.email = user_data['email']
+                user.username = user_data['email']
                 user.save()     # 새로운 사용자 생성
+                cur_username = user_data['email']
+            else:
+                print("else문 안으로 들어옴")
+                # 존재한다면, username을 해당 로그인 한 사용자의 email의 username 으로 바꾸기
+                # user.username = CustomUser.objects.get(email)
+                user_instance = CustomUser.objects.get(email=user_data['email'])
+                exist_username = user_instance.username
+                print("exist_username: ", exist_username)
+
+                cur_username = exist_username
 
             # user = authenticate(username=user_data['email'], password=None)     # ???
-            user = authenticate(username=user_data['email'], password="test")  # 실험
-            print(user)
+            # user = authenticate(username=user_data['email'], password="test")  # 실험
+            user = authenticate(username=cur_username, password="test")  # 실험
+
+            print("받은 이메일: ", user_data['email'])
+            # user = authenticate(email=user_data['email'], password="test")  # 실험
+            print("authenticate 바로 아래: ", user)
             if user is not None:
                 auth.login(request, user)
-                print(user.is_authenticated)
+                print("인증되었니?: ", user.is_authenticated)
                 token, created = Token.objects.get_or_create(user_id=user.id)     # 이게 안되는데
-                print(token.key)        # 확인
-                print(token)            # 확인
+                print("token 값: ", token.key)        # 확인
+                # print(token)            # 확인
                 return Response({'token': token.key})
             else:
                 return Response({'error': 'Authentication failed.'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -51,8 +69,10 @@ class SocialLoginAPIView(APIView):
 class UsersList(APIView):
     @method_decorator(login_required)
     def get(self, request):
+        print("<UserList> request.user: ", request.user)
+
         users = CustomUser.objects.exclude(username=request.user)
-        serializer = CustomUserSerializer(users, many=True)
+        serializer = CustomUserSerializerSearch(users, many=True)
         return Response(serializer.data)
 
 
@@ -61,14 +81,12 @@ class UserDetail(APIView):
     @method_decorator(login_required, name='dispatch')
     def get(self, request):
         cur_user = request.user
-        print("cur_user")
         print(request.user)         # username
         print(request.user.email)   # email
         cususer = CustomUser.objects.filter(username=cur_user)
 
         user_instance = CustomUser.objects.get(username=request.user)
         user_instance.update_total_posts()
-
         print("user_instance: ", user_instance)
 
         if cususer.exists():
@@ -78,11 +96,11 @@ class UserDetail(APIView):
             msg = {"msg": "User not found error"}
             return Response(msg, status=status.HTTP_404_NOT_FOUND)
 
-    # 플러터에서 이메일 변경 안되게 막을것. username을 바꿀것
-    # username이 unique라서 괜찮을수도
+    # 플러터에서 수정: username, profile_pic, background_pic
     @method_decorator(login_required, name='dispatch')
     def put(self, request):
         cur_user = request.user
+        print("<UserDetail(PUT)> request.user", cur_user)
 
         user_instance = CustomUser.objects.get(username=request.user)
         total_post = user_instance.update_total_posts()
@@ -97,6 +115,8 @@ class UserDetail(APIView):
 
         dict_request = request.data
         combined_dict = {**dict_request, **total_post}
+
+        print("combined_dict: ", combined_dict)
 
         try:
             obj = CustomUser.objects.get(username=cur_user)
@@ -131,6 +151,13 @@ class TotalPost(APIView):
         return Response(serializer.data)
 
 
+class FriendDetail(APIView):
+    def get(self, request, user_id):
+        requser = CustomUser.objects.get(id=user_id)
+        serializer = CustomUserSerializer(requser)
+        return Response(serializer.data)
+
+
 
 """
 # 로그인 요청: 구글에서 인증받은 이메일을 전달
@@ -138,7 +165,8 @@ class TotalPost(APIView):
     "email": "min02choi@naver.com"
 }
 
-# 닉네임 변경할 때
+# 닉네임 / 프사 / 배사 변경할 때
+# PUT 메소드: customuser/mypage
 {
     "username": "Choi Min Young",
     "profile_pic": "https://cdn.newspenguin.com/news/photo/202104/4406_13982_1239.jpg",
