@@ -34,6 +34,8 @@ class _UserPageState extends State<UserPage> {
 
   TextEditingController _textFieldController = TextEditingController();
 
+  String? username;
+
   @override
   void initState() {
     super.initState();
@@ -41,6 +43,11 @@ class _UserPageState extends State<UserPage> {
     rootBundle.loadString('assets/credentials.json').then((json) {
       api = CloudApi(json);
     });
+    if(userData == null){
+      username = "NAME";
+    }else{
+      username = userData!.username;
+    }
   }
 
   Future<void> _loadUserData() async {
@@ -411,23 +418,23 @@ class _UserPageState extends State<UserPage> {
               ),
             ),
 
-
+            // 유저 이름 & 게시물 수
             Positioned(
               top: MediaQuery.of(context).size.height / 4 + 20, // 배경 이미지 하단에서의 위치
-              right: 20.0, // 배경 이미지 좌측에서의 위치
+              right: 50.0, // 배경 이미지 좌측에서의 위치
+              left: 150,
               child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
-
                   GestureDetector(
                     onTap: (){
                       _showChangeUsernameDialog();
                     },
                     child: Text(
-                        userData != null
-                            ? userData!.username! : "unkown",
+                        username != null
+                            ? username! : "unkown",
                         style: TextStyle(
-                          fontSize: 15.0,
+                          fontSize: 20.0,
                           color: Colors.black54,
                         ),
                   )
@@ -435,7 +442,7 @@ class _UserPageState extends State<UserPage> {
                   ),
 
                   // 포스팅 개수
-                  SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
+                  SizedBox(width: 60.0), // 이미지와 텍스트 간의 간격 조절
                   Text(
                     userData != null ? userData!.postSum!.toString() + " posts" : "Nan",
                     style: TextStyle(
@@ -503,6 +510,9 @@ class _UserPageState extends State<UserPage> {
 
   // 클릭한 사진을 크게 보여주는 다이얼로그
   void _showImageDialog(String imageUrl, UserPagePosts data) {
+    String postdate = data.postDate.split(" ").first;
+    print("게시 날짜 : $postdate");
+
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -524,12 +534,12 @@ class _UserPageState extends State<UserPage> {
             children: [
               Text(
                 data.title,
-                style: TextStyle(fontSize: 20),
+                style: TextStyle(fontSize: 18),
               ),
 
               Text(
-                data.postDate.split(" ").first,
-                style: TextStyle(fontSize: 20),
+                postdate,
+                style: TextStyle(fontSize: 13),
               ),
             ],
           ),
@@ -621,6 +631,7 @@ class _UserPageState extends State<UserPage> {
     changeUserName(_textFieldController.text);
     _loadUserData();
     setState(() {
+      username = _textFieldController.text;
     });
   }
 }

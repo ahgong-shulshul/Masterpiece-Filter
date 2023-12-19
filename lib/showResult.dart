@@ -1,11 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/Home.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:path_provider/path_provider.dart';
-import './filter.dart';
 
 class ShowResultPage extends StatefulWidget {
   final File? _image;

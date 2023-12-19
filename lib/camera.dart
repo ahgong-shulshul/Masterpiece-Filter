@@ -1,16 +1,12 @@
 import 'dart:io';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/CloudApi.dart';
+import 'package:into_the_masterpiece/loading.dart';
 import 'package:into_the_masterpiece/login.dart';
-import 'package:into_the_masterpiece/showResult.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:into_the_masterpiece/userpage.dart';
-import 'package:http/http.dart' as http;
-import 'package:googleapis/storage/v1.dart' as storage;
 import 'package:path_provider/path_provider.dart';
 
 import 'enumdata.dart';
@@ -91,11 +87,11 @@ class _CameraExeState extends State<CameraExe> {
   ///////////// 필터 칸 ///////////////////////////////////////////
 
   final Map<StyleType, Image> filtersMap = {
-    StyleType.the_scream: Image.asset("assets/monk.jpg", fit: BoxFit.fill),
-    StyleType.rain_princess: Image.asset("assets/splash.png", fit: BoxFit.fill),
-    StyleType.la_muse: Image.asset("assets/tmp2.png", fit: BoxFit.fill),
-    StyleType.the_shipwreck_of_the_minotaur: Image.asset("assets/tmp4.png", fit: BoxFit.fill),
-    StyleType.udnie: Image.asset("assets/tmp1.png", fit: BoxFit.fill),
+    StyleType.the_scream: Image.asset("assets/the_scream.jpg", fit: BoxFit.fill),
+    StyleType.rain_princess: Image.asset("assets/rain_princess.jpg", fit: BoxFit.fill),
+    StyleType.la_muse: Image.asset("assets/la_muse.jpg", fit: BoxFit.fill),
+    StyleType.the_shipwreck_of_the_minotaur: Image.asset("assets/the_shipwreck_of_the_minotaur.jpg", fit: BoxFit.fill),
+    StyleType.udnie: Image.asset("assets/udnie.jpg", fit: BoxFit.fill),
     StyleType.wave: Image.asset("assets/wave.jpg", fit: BoxFit.fill),
   };
 
@@ -185,17 +181,22 @@ class _CameraExeState extends State<CameraExe> {
                 IconButton(
                   icon: Icon(Icons.check),
                   onPressed: () {
-                    // 스토리지에 필터 인덱스와 함께 사진 업로드
-                    //uploadImage(_image!);
-                    uploadImage("mf-content-images");
+                    if(_filtertype != null){
+                      uploadImage("mf-content-images");
 
-                    // 결과창으로 이동
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => ShowResultPage(_image, _imageName)
-                        )
-                    );
+                      // 결과창으로 이동
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => LoadingScreen(_image, _imageName)
+                          )
+                      );
+                    }
+                    else{
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("필터를 골라주세요!"),),
+                      );
+                    }
                   },
                 ),
               ],

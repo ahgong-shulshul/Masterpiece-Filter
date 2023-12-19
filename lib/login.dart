@@ -30,6 +30,7 @@ class _LoginExeState extends State<LoginExe> {
       // http 객체로 Django에 유저 이메일 전송
       sendEmailAndReceiveToken(googleUser.email);
 
+
       setState(() {
         _loginPlatform = LoginPlatform.google;
       });
@@ -76,6 +77,8 @@ class _LoginExeState extends State<LoginExe> {
   }
 
   void signOut() async {
+    print('_loginPlatform before signOut: $_loginPlatform'); // 디버깅용 출력
+
     switch (_loginPlatform) {
       case LoginPlatform.google:
         await GoogleSignIn().signOut();
@@ -90,6 +93,8 @@ class _LoginExeState extends State<LoginExe> {
       case LoginPlatform.none:
         break;
     }
+
+    print('_loginPlatform after signOut: $_loginPlatform');
 
     setState(() {
       _loginPlatform = LoginPlatform.none;
