@@ -257,7 +257,7 @@ class _VisitedPageState extends State<VisitedPage> {
                         String imageUrl = userPosts![index].postUrl;
                         return GestureDetector(
                             onTap: () {
-                              _showImageDialog(imageUrl);
+                              _showImageDialog(imageUrl, userPosts![index]);
                             },
 
                             child: _buildPhoto(imageUrl)
@@ -290,21 +290,84 @@ class _VisitedPageState extends State<VisitedPage> {
     );
   }
 
-  // 클릭한 사진을 크게 보여주는 다이얼로그
-  void _showImageDialog(String imageUrl) {
+  void _showImageDialog(String imageUrl, UserPagePosts data) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
-          child: InteractiveViewer(
-            boundaryMargin: EdgeInsets.all(20.0),
-            minScale:0.5,
-            maxScale:2.0,
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.contain,
-            ),
+        return AlertDialog(
+          /// 배경 컬러
+          backgroundColor: Colors.grey.shade100,
+          /// 그림자 컬러
+          shadowColor: Colors.black,
+
+          /// 다이얼로그의 모양 설정
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(15),
           ),
+          /// z축 높이, elevation의 값이 높을 수록 그림자가 아래 위치하게 됩니다.
+          elevation: 10,
+
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                data.title,
+                style: TextStyle(fontSize: 20),
+              ),
+
+              Text(
+                data.postDate,
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: Stack(
+            children: [
+              Positioned(
+                child: InteractiveViewer(
+                  boundaryMargin: EdgeInsets.all(1.0),
+                  minScale:0.5,
+                  maxScale:2.0,
+                  child: Image.network(
+                    imageUrl,
+                    fit: BoxFit.contain,
+                  ),
+                ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 8,
+                  padding: EdgeInsets.only(bottom: 15.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.0), // 맨 위는 투명
+                        Colors.black.withOpacity(0.5), // 중간은 반 투명
+                        Colors.black.withOpacity(0.8), // 맨 아래는 좀 진한 투명
+                      ],
+                    ), // 투명한 검은색 배경
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      data.desc,
+                      style: TextStyle(
+                        color: Colors.white, // 흰색 텍스트
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+
         );
       },
     );

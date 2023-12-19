@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:gcloud/storage.dart';
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/Home.dart';
@@ -9,6 +11,8 @@ import 'package:into_the_masterpiece/enumdata.dart';
 import 'package:into_the_masterpiece/search_follower.dart';
 import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:into_the_masterpiece/userpage_data.dart';
+
+import 'CloudApi.dart';
 
 
 class UserPage extends StatefulWidget {
@@ -21,11 +25,22 @@ class UserPage extends StatefulWidget {
 class _UserPageState extends State<UserPage> {
   UserPageData? userData;
   List<UserPagePosts>? userPosts;
+  
+  File? _BGImage;
+  File? _ProfileImage;
+  final picker = ImagePicker();
+
+  late CloudApi api;
+
+  TextEditingController _textFieldController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadUserData();
+    rootBundle.loadString('assets/credentials.json').then((json) {
+      api = CloudApi(json);
+    });
   }
 
   Future<void> _loadUserData() async {
@@ -120,8 +135,8 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  Future<void> SendChangedUserData() async {
-    final String apiUrl = 'http://10.0.2.2:8000/customuser/social-login/';
+  Future<void> SendChangedBG(var url) async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
     String? token = await TokenManager.loadToken();
 
     if(token != null){
@@ -132,8 +147,9 @@ class _UserPageState extends State<UserPage> {
             'Authorization': 'Bearer $token',
           },
           body:jsonEncode({
-            'back_ground': _BGImage?.path,
-            'profile': _ProfileImage?.path,
+            'username' : userData?.username,
+            'profile_pic': userData?.profile_picture,
+            'background_pic': url,
           })
       );
 
@@ -152,26 +168,114 @@ class _UserPageState extends State<UserPage> {
     }
   }
 
-  File? _BGImage;
-  File? _ProfileImage;
-  final picker = ImagePicker();
+  Future<void> SendChangedProfile(var url) async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
+    String? token = await TokenManager.loadToken();
 
+    if(token != null){
+      final response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body:jsonEncode({
+            'username' : userData?.username,
+            'profile_pic': url,
+            'background_pic': userData?.background_picture,
+          })
+      );
+
+      if (response.statusCode == 200) {
+        print('데이터 전송 성공');
+      }
+      else {
+        print('데이터 전송 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
+      }
+    }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
+
+  Future<void> changeUserName(String newName) async {
+    final String apiUrl = 'http://10.0.2.2:8000/customuser/page/';
+    String? token = await TokenManager.loadToken();
+
+    if(token != null){
+      final response = await http.post(
+          Uri.parse(apiUrl),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $token',
+          },
+          body:jsonEncode({
+            'username' : newName,
+            'profile_pic': userData?.profile_picture,
+            'background_pic': userData?.background_picture,
+          })
+      );
+
+      if (response.statusCode == 200) {
+        print('데이터 전송 성공');
+      }
+      else {
+        print('데이터 전송 실패');
+        print('HTTP Status Code: ${response.statusCode}');
+        throw Exception('Failed to fetch user data');
+      }
+    }
+    else {
+      print('토큰이 null입니다.');
+      throw Exception('Token is null');
+    }
+  }
+  
+  String? _imageName;
+  Uint8List? _imageBytes;
+  
+  Future<Uri> uploadImage(String bucketName) async {
+    final response = await api.save(_imageName!, _imageBytes!, bucketName);
+    print(response.downloadLink);
+
+    return response.downloadLink;
+  }
+  
   // 비동기 처리를 통해 카메라와 갤러리에서 이미지를 가져온다.
-  Future getBGImage(ImageSource imageSource) async {
+  Future changeBGImage(ImageSource imageSource) async {
     final image = await picker.pickImage(source: imageSource);
 
     setState(() {
       _BGImage = File(image!.path); // 가져온 이미지를 _image에 저장
+      _imageBytes = _BGImage!.readAsBytesSync();
+      _imageName=_BGImage!.path.split('/').last;
     });
+    
+    // 이미지를 스토리지에 업로드 -> 다운로드 링크를 받아서 백으로 전달
+    var imgUrl = uploadImage("userimage_storage");
+    SendChangedBG(imgUrl);
   }
-  Future getProfileImage(ImageSource imageSource) async {
+  
+  
+  Future changeProfileImage(ImageSource imageSource) async {
     final image = await picker.pickImage(source: imageSource);
 
     setState(() {
       _ProfileImage = File(image!.path); // 가져온 이미지를 _image에 저장
+      _imageBytes = _ProfileImage!.readAsBytesSync();
+      _imageName=_ProfileImage!.path.split('/').last;
     });
+
+    // 이미지를 스토리지에 업로드 -> 다운로드 링크를 받아서 백으로 전달
+    var imgUrl = uploadImage("userimage_storage");
+    SendChangedProfile(imgUrl);
   }
 
+ 
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -232,12 +336,10 @@ class _UserPageState extends State<UserPage> {
               child: PopupMenuButton<SettingMenu>(
                 onSelected: (SettingMenu res){
                   if(res == SettingMenu.changeBGImg){   // 배경 사진 변경
-                    getBGImage(ImageSource.gallery);
-                    SendChangedUserData();
+                    changeBGImage(ImageSource.gallery); 
                   }
                   else if(res == SettingMenu.changProfileImg){    // 프로필 사진 변경
-                    getProfileImage(ImageSource.gallery);
-                    SendChangedUserData();
+                    changeProfileImage(ImageSource.gallery);
                   }
                   else{
                     Navigator.push(
@@ -314,15 +416,21 @@ class _UserPageState extends State<UserPage> {
               right: 20.0, // 배경 이미지 좌측에서의 위치
               child: Row(
                 children: [
-                  // 유저 닉네임
                   SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
-                  Text(
-                    userData != null
-                        ? userData!.username! : "unkown",
-                    style: TextStyle(
-                      fontSize: 15.0,
-                      color: Colors.black54,
-                    ),
+
+                  GestureDetector(
+                    onTap: (){
+                      _showChangeUsernameDialog();
+                    },
+                    child: Text(
+                        userData != null
+                            ? userData!.username! : "unkown",
+                        style: TextStyle(
+                          fontSize: 15.0,
+                          color: Colors.black54,
+                        ),
+                  )
+
                   ),
 
                   // 포스팅 개수
@@ -359,15 +467,13 @@ class _UserPageState extends State<UserPage> {
                           String imageUrl = userPosts![index].postUrl;
                           return GestureDetector(
                               onTap: () {
-                                _showImageDialog(imageUrl);
+                                _showImageDialog(imageUrl, userPosts![index]);
                               },
 
                               child: _buildPhoto(imageUrl)
                           );
                         }
-                        else{
 
-                        }
                       }
                   ),
                 )
@@ -392,15 +498,15 @@ class _UserPageState extends State<UserPage> {
   }
 
   // 클릭한 사진을 크게 보여주는 다이얼로그
-  void _showImageDialog(String imageUrl) {
+  void _showImageDialog(String imageUrl, UserPagePosts data) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return Dialog(
+        return AlertDialog(
           /// 배경 컬러
           backgroundColor: Colors.grey.shade100,
           /// 그림자 컬러
-          shadowColor: Colors.white,
+          shadowColor: Colors.black,
 
           /// 다이얼로그의 모양 설정
           shape: RoundedRectangleBorder(
@@ -409,55 +515,108 @@ class _UserPageState extends State<UserPage> {
           /// z축 높이, elevation의 값이 높을 수록 그림자가 아래 위치하게 됩니다.
           elevation: 10,
 
-          child: Container(
-            child: Column(
-              children: <Widget>[
-                Row(
-                  children: [
-                    Text(
-                        "title",
-                      style: TextStyle(
-                        fontSize: 10.0,
+          title: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                data.title,
+                style: TextStyle(fontSize: 20),
+              ),
 
+              Text(
+                data.postDate,
+                style: TextStyle(fontSize: 20),
+              ),
+            ],
+          ),
+          content: Stack(
+            children: [
+              Positioned(
+                child: InteractiveViewer(
+                boundaryMargin: EdgeInsets.all(1.0),
+                minScale:0.5,
+                maxScale:2.0,
+                child: Image.network(
+                  imageUrl,
+                  fit: BoxFit.contain,
+                ),
+              ),
+              ),
+              Positioned(
+                left: 0,
+                right: 0,
+                bottom: 0,
+                child: Container(
+                  height: MediaQuery.of(context).size.height / 8,
+                  padding: EdgeInsets.only(bottom: 15.0),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                      colors: [
+                        Colors.black.withOpacity(0.0), // 맨 위는 투명
+                        Colors.black.withOpacity(0.5), // 중간은 반 투명
+                        Colors.black.withOpacity(0.8), // 맨 아래는 좀 진한 투명
+                      ],
+                    ), // 투명한 검은색 배경
+                  ),
+                  child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Text(
+                      data.desc,
+                      style: TextStyle(
+                        color: Colors.white, // 흰색 텍스트
+                        fontSize: 20.0,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(width:5.0),
-                    Text("2023-12-31",
-                    style: TextStyle(
-                      fontSize: 6.0,
-                    ),),
-                  ],
-                ),
-                InteractiveViewer(
-                  boundaryMargin: EdgeInsets.all(20.0),
-                  minScale:0.5,
-                  maxScale:2.0,
-                  child: Image.network(
-                    imageUrl,
-                    fit: BoxFit.contain,
                   ),
-
                 ),
-                Text(
-                    "ㄴr는 ㄱr끔 눈물.을 흘린ㄷr...",
-                style: TextStyle(
-                  fontSize: 8.0,
-                ),),
-              ],
+              ),
+            ],
+          ),
 
-            )
-          )
-          // child: InteractiveViewer(
-          //   boundaryMargin: EdgeInsets.all(20.0),
-          //   minScale:0.5,
-          //   maxScale:2.0,
-          //   child: Image.network(
-          //     imageUrl,
-          //     fit: BoxFit.contain,
-          //   ),
-          // ),
         );
       },
     );
+  }
+
+
+  // 닉네임 변경 다이얼로그 표시
+  void _showChangeUsernameDialog() async {
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: TextField(
+            controller: _textFieldController,
+            decoration: InputDecoration(hintText: "새로운 이름"),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: Text("취소"),
+            ),
+            TextButton(
+              onPressed: () {
+                _updateUsername(); // 닉네임 업데이트 메서드 호출
+                Navigator.pop(context); // 다이얼로그 닫기
+              },
+              child: Text("변경"),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  // 닉네임 업데이트 메서드
+  void _updateUsername() {
+    changeUserName(_textFieldController.text);
+    _loadUserData();
+    setState(() {
+    });
   }
 }

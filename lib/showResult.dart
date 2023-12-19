@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:into_the_masterpiece/Home.dart';
+import 'package:into_the_masterpiece/token_manager.dart';
 import 'package:path_provider/path_provider.dart';
 import './filter.dart';
 
@@ -135,8 +136,15 @@ class _ShowResultPageState extends State<ShowResultPage> {
                       ),
                     ),
                     onPressed: () {
+                      if(TokenManager.loadToken() == null){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(content: Text("로그인이 필요한 기능입니다!"),)
+                        );
+                      }
                       // 사진 계정으로 업로드
-                      // 로그인 유무 따져야?
+                      else{
+                        
+                      }
 
                     },
                   ),
