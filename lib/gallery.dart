@@ -117,7 +117,7 @@ class _GalleryExeState extends State<GalleryExe> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ShowResultPage(_image)
+                            builder: (context) => ShowResultPage(_image, "_image")
                         )
                     );
                   },

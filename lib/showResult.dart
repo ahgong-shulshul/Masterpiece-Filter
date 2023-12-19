@@ -9,8 +9,8 @@ import './filter.dart';
 
 class ShowResultPage extends StatefulWidget {
   final File? _image;
-
-  const ShowResultPage(this._image);
+  final String? _imageName;
+  const ShowResultPage(this._image, this._imageName);
 
   @override
   _ShowResultPageState createState() => _ShowResultPageState();
@@ -18,6 +18,20 @@ class ShowResultPage extends StatefulWidget {
 }
 
 class _ShowResultPageState extends State<ShowResultPage> {
+  late String userid;
+  late String stylizedImageURl;
+
+  @override
+  void initState() {
+    super.initState();
+    _initializeData();
+  }
+
+  Future<void> _initializeData() async {
+    userid = await TokenManager.loadToken() ?? '';
+    stylizedImageURl = "https://storage.googleapis.com/mf-stylized-images/$userid/${widget._imageName}";
+    setState(() {});
+  }
   // 이미지를 보여주는 위젯
   Widget showImage() {
     return Container(
@@ -29,7 +43,10 @@ class _ShowResultPageState extends State<ShowResultPage> {
         child: Center(
             child: widget._image == null
                 ? Text('Take Image')
-                : Image.file(File(widget._image!.path))));
+                : Image.network(
+              stylizedImageURl,
+            )
+        ));
   }
 
   // 이미지를 기기에 저장하는 함수

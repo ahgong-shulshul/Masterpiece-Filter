@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
+import 'package:googleapis/storage/v1.dart' as storage;
 import 'package:googleapis_auth/auth_io.dart' as auth;
 import 'package:gcloud/storage.dart';
 import 'package:mime/mime.dart';
@@ -56,5 +58,21 @@ class CloudApi{
 
     return jsonEncode(jsonData);
   }
+
+  // Future<void> downloadImage(String bucketName, String objectName, String localFilePath) async {
+  //   final authClient = await auth.clientViaServiceAccount(_credentials, Storage.SCOPES);
+  //   final storageApi = storage.StorageApi(authClient);
+  //
+  //   final storage.ObjectsResourceApi objectsApi = storageApi.objects;
+  //
+  //   final stream = await objectsApi.get(bucketName, objectName).asStream();
+  //   final file = File(localFilePath);
+  //
+  //   await file.create();
+  //
+  //   await stream.pipe(file.openWrite());
+  //
+  //   print('Downloaded image from GCS to $localFilePath');
+  // }
 
 }

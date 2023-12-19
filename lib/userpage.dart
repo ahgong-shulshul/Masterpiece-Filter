@@ -68,7 +68,7 @@ class _UserPageState extends State<UserPage> {
       );
 
       if (response.statusCode == 200) {
-        print('데이터 통신 성공');
+        print('데이터 통신 성공 :ReceiveUserData');
         //print(response.body);
 
         // JSON 문자열을 파싱
@@ -81,18 +81,18 @@ class _UserPageState extends State<UserPage> {
           return UserPageData.fromJson(userDataMap);
         }
         else{
-          throw Exception('Empty response data');
+          throw Exception('Empty response data :ReceiveUserData');
         }
 
       }
       else {
-        print('데이터 얻기 실패');
+        print('데이터 얻기 실패 :ReceiveUserData');
         print('HTTP Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch user data');
       }
     }
     else {
-      print('토큰이 null입니다.');
+      print('토큰이 null입니다:ReceiveUserData');
       throw Exception('Token is null');
     }
   }
@@ -124,13 +124,13 @@ class _UserPageState extends State<UserPage> {
         return userPosts;
       }
       else {
-        print('데이터 얻기 실패');
+        print('데이터 얻기 실패:ReceiveUserPosts');
         print('HTTP Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch user data');
       }
     }
     else {
-      print('토큰이 null입니다.');
+      print('토큰이 null입니다.:ReceiveUserPosts');
       throw Exception('Token is null');
     }
   }
@@ -154,16 +154,16 @@ class _UserPageState extends State<UserPage> {
       );
 
       if (response.statusCode == 200) {
-        print('데이터 전송 성공');
+        print('데이터 전송 성공:SendChangedBG');
       }
       else {
-        print('데이터 전송 실패');
+        print('데이터 전송 실패:SendChangedBG');
         print('HTTP Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch user data');
       }
     }
     else {
-      print('토큰이 null입니다.');
+      print('토큰이 null입니다:SendChangedBG');
       throw Exception('Token is null');
     }
   }
@@ -187,16 +187,16 @@ class _UserPageState extends State<UserPage> {
       );
 
       if (response.statusCode == 200) {
-        print('데이터 전송 성공');
+        print('데이터 전송 성공:SendChangedProfile');
       }
       else {
-        print('데이터 전송 실패');
+        print('데이터 전송 실패:SendChangedProfile');
         print('HTTP Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch user data');
       }
     }
     else {
-      print('토큰이 null입니다.');
+      print('토큰이 null입니다:SendChangedProfile');
       throw Exception('Token is null');
     }
   }
@@ -220,16 +220,16 @@ class _UserPageState extends State<UserPage> {
       );
 
       if (response.statusCode == 200) {
-        print('데이터 전송 성공');
+        print('데이터 전송 성공:changeUserName');
       }
       else {
-        print('데이터 전송 실패');
+        print('데이터 전송 실패:changeUserName');
         print('HTTP Status Code: ${response.statusCode}');
         throw Exception('Failed to fetch user data');
       }
     }
     else {
-      print('토큰이 null입니다.');
+      print('토큰이 null입니다:changeUserName');
       throw Exception('Token is null');
     }
   }
@@ -239,7 +239,7 @@ class _UserPageState extends State<UserPage> {
   
   Future<String> uploadImage(String bucketName) async {
     final response = await api.save(_imageName!, _imageBytes!, bucketName);
-    String url = 'https://storage.googleapis.com/$bucketName/$_imageName}';
+    String url = 'https://storage.googleapis.com/$bucketName/$_imageName';
     print(response.downloadLink);
     print("백에 전송한 이미지 url: $url");
     return url;

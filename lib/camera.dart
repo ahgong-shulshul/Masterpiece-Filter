@@ -193,7 +193,7 @@ class _CameraExeState extends State<CameraExe> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: (context) => ShowResultPage(_image)
+                            builder: (context) => ShowResultPage(_image, _imageName)
                         )
                     );
                   },
