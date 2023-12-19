@@ -158,6 +158,7 @@ class _UserPageState extends State<UserPage> {
 
       if (response.statusCode == 200) {
         print('데이터 전송 성공:SendChangedBG');
+        setState(() { });
       }
       else {
         print('데이터 전송 실패:SendChangedBG');
@@ -191,6 +192,7 @@ class _UserPageState extends State<UserPage> {
 
       if (response.statusCode == 200) {
         print('데이터 전송 성공:SendChangedProfile');
+        setState(() { });
       }
       else {
         print('데이터 전송 실패:SendChangedProfile');
@@ -224,6 +226,7 @@ class _UserPageState extends State<UserPage> {
 
       if (response.statusCode == 200) {
         print('데이터 전송 성공:changeUserName');
+        setState(() { });
       }
       else {
         print('데이터 전송 실패:changeUserName');
@@ -438,7 +441,7 @@ class _UserPageState extends State<UserPage> {
                   ),
 
                   // 포스팅 개수
-                  SizedBox(width: 60.0), // 이미지와 텍스트 간의 간격 조절
+                  //SizedBox(width: 60.0), // 이미지와 텍스트 간의 간격 조절
                   Text(
                     userData != null ? userData!.postSum!.toString() + " posts" : "Nan",
                     style: TextStyle(
@@ -600,7 +603,7 @@ class _UserPageState extends State<UserPage> {
         return AlertDialog(
           content: TextField(
             controller: _textFieldController,
-            decoration: InputDecoration(hintText: "새로운 이름"),
+            decoration: InputDecoration(hintText: "10자 이내"),
           ),
           actions: [
             TextButton(
@@ -626,6 +629,5 @@ class _UserPageState extends State<UserPage> {
   void _updateUsername() {
     changeUserName(_textFieldController.text);
     _loadUserData();
-
   }
 }

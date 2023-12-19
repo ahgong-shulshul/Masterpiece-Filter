@@ -225,7 +225,7 @@ class _VisitedPageState extends State<VisitedPage> {
                 ),
 
                 // 포스팅 개수
-                SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
+               // SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
                   userData != null ? userData!.postSum!.toString() + " posts" : "Nan",
                   style: TextStyle(
