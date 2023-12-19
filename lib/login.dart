@@ -28,7 +28,7 @@ class _LoginExeState extends State<LoginExe> {
       print('id = ${googleUser.id}');
 
       // http 객체로 Django에 유저 이메일 전송
-      sendEmailAndReceiveToken(googleUser.email);
+      await sendEmailAndReceiveToken(googleUser.email);
 
 
       setState(() {

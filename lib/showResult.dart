@@ -28,7 +28,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
   Future<void> _initializeData() async {
     userid = await TokenManager.loadToken();
     stylizedImageURl = "https://storage.googleapis.com/mf-stylized-images/$userid/${widget._imageName}";
-    setState(() {});
+
   }
   // 이미지를 보여주는 위젯
   Widget showImage() {
@@ -113,7 +113,22 @@ class _ShowResultPageState extends State<ShowResultPage> {
                 ),
               ],
             ),
-            showImage(),
+            FutureBuilder<void>(
+                future: _initializeData(),
+                builder: (context, snapshot){
+                  if(snapshot.connectionState == ConnectionState.waiting){
+                    return CircularProgressIndicator();
+                  }
+                  else{
+                    if(stylizedImageURl != null) {
+                      print("stylizedImageURl : $stylizedImageURl");
+                      return showImage();
+                    }
+                    else{
+                      print("stylizedUrl is null"); return Container();}
+                    }
+                }
+            ),
             Container(
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
