@@ -43,11 +43,7 @@ class _UserPageState extends State<UserPage> {
     rootBundle.loadString('assets/credentials.json').then((json) {
       api = CloudApi(json);
     });
-    if(userData == null){
-      username = "NAME";
-    }else{
-      username = userData!.username;
-    }
+
   }
 
   Future<void> _loadUserData() async {
@@ -431,8 +427,8 @@ class _UserPageState extends State<UserPage> {
                       _showChangeUsernameDialog();
                     },
                     child: Text(
-                        username != null
-                            ? username! : "unkown",
+                        userData != null
+                            ? userData!.username : "unkown",
                         style: TextStyle(
                           fontSize: 20.0,
                           color: Colors.black54,
@@ -510,7 +506,7 @@ class _UserPageState extends State<UserPage> {
 
   // 클릭한 사진을 크게 보여주는 다이얼로그
   void _showImageDialog(String imageUrl, UserPagePosts data) {
-    String postdate = data.postDate.split(" ").first;
+    String postdate = data.postDate.split("T").first;
     print("게시 날짜 : $postdate");
 
     showDialog(
@@ -630,8 +626,6 @@ class _UserPageState extends State<UserPage> {
   void _updateUsername() {
     changeUserName(_textFieldController.text);
     _loadUserData();
-    setState(() {
-      username = _textFieldController.text;
-    });
+
   }
 }

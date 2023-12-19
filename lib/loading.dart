@@ -12,7 +12,7 @@ class LoadingScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // 로딩이 완료되면 navigateToNextPage 함수를 호출하여 다음 페이지로 이동
-    Future.delayed(Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: 60), () {
       navigateToNextPage(context);
     });
 

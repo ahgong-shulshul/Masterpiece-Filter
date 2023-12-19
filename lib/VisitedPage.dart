@@ -210,15 +210,16 @@ class _VisitedPageState extends State<VisitedPage> {
           Positioned(
             top: MediaQuery.of(context).size.height / 4 + 20, // 배경 이미지 하단에서의 위치
             right: 20.0, // 배경 이미지 좌측에서의 위치
+            left: 150,
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+
               children: [
-                // 유저 닉네임
-                SizedBox(width: 20.0), // 이미지와 텍스트 간의 간격 조절
                 Text(
                   userData != null
                       ? userData!.username! : "unkown",
                   style: TextStyle(
-                    fontSize: 15.0,
+                    fontSize: 20.0,
                     color: Colors.black54,
                   ),
                 ),
@@ -316,8 +317,8 @@ class _VisitedPageState extends State<VisitedPage> {
               ),
 
               Text(
-                data.postDate,
-                style: TextStyle(fontSize: 20),
+                data.postDate.split("T").first,
+                style: TextStyle(fontSize: 13),
               ),
             ],
           ),
