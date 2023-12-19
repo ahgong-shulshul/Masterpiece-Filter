@@ -528,7 +528,7 @@ class _UserPageState extends State<UserPage> {
               ),
 
               Text(
-                data.postDate,
+                data.postDate.split(" ").first,
                 style: TextStyle(fontSize: 20),
               ),
             ],

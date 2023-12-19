@@ -81,6 +81,7 @@ class _LoginExeState extends State<LoginExe> {
         await GoogleSignIn().signOut();
         _loginPlatform = LoginPlatform.none;
         TokenManager.deleteToken();
+        print("logout");
         break;
       case LoginPlatform.kakao:
         break;
