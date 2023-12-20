@@ -92,7 +92,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
            }),
      );
 
-     if (response.statusCode == 200) {
+     if ((response.statusCode / 100) == 2) {
        print('게시글 데이터 전송 성공');
        Navigator.push(
            context, MaterialPageRoute(builder: (_) => UserPage()));
@@ -227,19 +227,21 @@ class _ShowResultPageState extends State<ShowResultPage> {
        context: context,
        builder: (BuildContext context) {
          return AlertDialog(
-           content: Column(
-             children: [
-               TextField(
-                 controller: titleController,
-                 decoration: InputDecoration(hintText: "제목: 10자 이내"),
-               ),
-               TextField(
-                 controller: contentController,
-                 decoration: InputDecoration(hintText: "내용: 10자 이내"),
-               ),
-             ],
+           content: Container(
+             height: MediaQuery.of(context).size.height / 3,  // 높이를 조절하려면 원하는 높이로 설정
+             child: Column(
+               children: [
+                 TextField(
+                   controller: titleController,
+                   decoration: InputDecoration(hintText: "제목: 10자 이내"),
+                 ),
+                 TextField(
+                   controller: contentController,
+                   decoration: InputDecoration(hintText: "내용: 10자 이내"),
+                 ),
+               ],
+             ),
            ),
-
            actions: [
              TextButton(
                onPressed: () {
@@ -249,8 +251,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
              ),
              TextButton(
                onPressed: () {
-                 _uploadPost(titleController.text,
-                     contentController.text); // 닉네임 업데이트 메서드 호출
+                 _uploadPost(titleController.text, contentController.text);
                  Navigator.pop(context); // 다이얼로그 닫기
                },
                child: Text("게시"),
