@@ -92,7 +92,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
            }),
      );
 
-     if ((response.statusCode / 100) == 2) {
+     if (response.statusCode == 201) {
        print('게시글 데이터 전송 성공');
        Navigator.push(
            context, MaterialPageRoute(builder: (_) => UserPage()));
@@ -228,7 +228,7 @@ class _ShowResultPageState extends State<ShowResultPage> {
        builder: (BuildContext context) {
          return AlertDialog(
            content: Container(
-             height: MediaQuery.of(context).size.height / 3,  // 높이를 조절하려면 원하는 높이로 설정
+             height: MediaQuery.of(context).size.height / 5,  // 높이를 조절하려면 원하는 높이로 설정
              child: Column(
                children: [
                  TextField(

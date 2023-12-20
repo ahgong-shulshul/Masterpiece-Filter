@@ -44,7 +44,7 @@ class _GalleryExeState extends State<GalleryExe> {
     // String token="test";
     if(token != null) {
       print(token);
-      await api.uploadJSON(token, _filtertype!, response.downloadLink.toString(), "mf-json-data");
+      await api.uploadJSON(token, _filtertype!, _imageName!, "mf-json-data");
     }
   }
 
