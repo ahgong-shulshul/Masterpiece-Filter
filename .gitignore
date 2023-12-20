@@ -1,0 +1,7 @@
+.idea/
+*.iml
+*.xml
+
+../.gitignore
+../.idea/Masterpiece-Filter.iml
+../.idea/misc.xml
