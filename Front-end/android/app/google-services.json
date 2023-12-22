@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "425571894663",
+    "project_id": "intothemasterpiece",
+    "storage_bucket": "intothemasterpiece.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:425571894663:android:e2dbcd4a13fbb433ac3f22",
+        "android_client_info": {
+          "package_name": "com.example.into_the_masterpiece"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyButTJYrUfpV2hjgQDGARZb_saTje43DBQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
