@@ -32,7 +32,7 @@
 
 ### 1. 초기화면
 
-<center><img align="center" width="300" alt="아키텍쳐" src="./images/init.gif"></center>
+<p align="center"><img align="center" width="300" alt="아키텍쳐" src="./images/init.gif"></p>
 
 ### 2. 촬용이미지 및 기존이미지 변환
 
