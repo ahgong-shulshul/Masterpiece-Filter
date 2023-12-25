@@ -36,7 +36,7 @@
 
 ### 2. 촬용이미지 및 기존이미지 변환
 
-<p align="center"><p><img width="300" alt="촬영이미지" src="./images/transfer.gif"><img width="300" alt="기존이미지" src="./images/image_transfer.gif"></p></p>
+<p align="center"><img width="300" alt="촬영이미지" src="./images/transfer.gif"><img width="300" alt="기존이미지" src="./images/image_transfer.gif"></p>
 
 ### 3. 변환된 이미지 저장 및 업로드
 
