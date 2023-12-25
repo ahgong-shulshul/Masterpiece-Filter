@@ -32,11 +32,11 @@
 
 ### 1. 초기화면
 
-<center><img width="300" alt="아키텍쳐" src="./images/init.gif"></center>
+<center><img align="center" width="300" alt="아키텍쳐" src="./images/init.gif"></center>
 
 ### 2. 촬용이미지 및 기존이미지 변환
 
-<center><img width="120" alt="아키텍쳐" src="./images/transfer.gif"><img width="120" alt="아키텍쳐" src="./images/image_transfer.gif"></center>
+<center><img width="150" alt="아키텍쳐" src="./images/transfer.gif"><img width="150" alt="아키텍쳐" src="./images/image_transfer.gif"></center>
 
 ### 3. 변환된 이미지 저장 및 업로드
 
