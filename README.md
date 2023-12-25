@@ -12,7 +12,7 @@
 
 ## 2️⃣ 개발환경 및 기술 스택
 
-<img width="816" alt="아키텍쳐" src="./images/architecture.png">
+![아키텍쳐](./images/architecture.png)
 
 ## 3️⃣ 주요 기능
 
