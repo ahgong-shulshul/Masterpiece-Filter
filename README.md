@@ -36,15 +36,15 @@
 
 ### 2. 촬용이미지 및 기존이미지 변환
 
-<center><img width="150" alt="아키텍쳐" src="./images/transfer.gif"><img width="150" alt="아키텍쳐" src="./images/image_transfer.gif"></center>
+<center><img width="300" alt="촬영이미지" src="./images/transfer.gif"><img width="300" alt="기존이미지" src="./images/image_transfer.gif"></center>
 
 ### 3. 변환된 이미지 저장 및 업로드
 
-<center><img width="300" alt="아키텍쳐" src="./images/upload.gif"></center>
+<center><img width="300" alt="업로드" src="./images/upload.gif"></center>
 
 ### 4. 구현 인스타 기타 기능(친구 검색/배경 및 아이디 변환)
 
-<center><img width="300" alt="아키텍쳐" src="./images/etcfunc.gif"></center>
+<center><img width="300" alt="기타기능" src="./images/etcfunc.gif"></center>
 
 ## 5️⃣ 명화 필터 적용 예시
 
